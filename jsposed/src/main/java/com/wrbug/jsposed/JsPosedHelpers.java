@@ -3,6 +3,7 @@ package com.wrbug.jsposed;
 import org.mozilla.javascript.Function;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,6 +44,11 @@ public class JsPosedHelpers {
         return XposedHelpers.callMethod(o, methodName, args);
     }
 
+    public Object callMethod(Object o, String methodName, Object[] classType, Object[] args) {
+        log("callMethod : " + o + " " + methodName + " " + Arrays.toString(args));
+        return XposedHelpers.callMethod(o, methodName, args);
+    }
+
     public Field findField(Class<?> clazz, String fieldName) {
         log("findField : " + clazz + " " + fieldName);
         return XposedHelpers.findFieldIfExists(clazz, fieldName);
@@ -58,15 +64,33 @@ public class JsPosedHelpers {
         return null;
     }
 
-    public XC_MethodHook.Unhook findAndHookMethod(Class<?> clazz, String methodName, String[] argType, Function beforeCall, Function afterCall) {
+    public XC_MethodHook.Unhook findAndHookMethod(Class<?> clazz, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
         log("findAndHookMethod clazz:" + clazz + " " + methodName + " " + Arrays.toString(argType));
         Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
         return XposedHelpers.findAndHookMethod(clazz, methodName, array);
     }
 
-    public XC_MethodHook.Unhook findAndHookMethod(String className, String methodName, String[] argType, Function beforeCall, Function afterCall) {
+    public XC_MethodHook.Unhook findAndHookMethod(String className, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
         Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
         log("findAndHookMethod className:" + className + " " + methodName + " " + Arrays.toString(argType));
         return XposedHelpers.findAndHookMethod(className, mParam.classLoader, methodName, argType, array);
+    }
+
+    public XC_MethodHook.Unhook findAndHookMethod(String className, ClassLoader classLoader, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
+        Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
+        log("findAndHookMethod classLoader:" + classLoader + " " + className + " " + methodName + " " + Arrays.toString(argType));
+        return XposedHelpers.findAndHookMethod(className, classLoader, methodName, argType, array);
+    }
+
+    public Method findMethodExact(Class<?> clazz, String methodName, Object[] parameterTypes) {
+        return XposedHelpers.findMethodExactIfExists(clazz, methodName, parameterTypes);
+    }
+
+    public Method findMethodExact(String className, ClassLoader classLoader, String methodName, Object... parameterTypes) {
+        return XposedHelpers.findMethodExactIfExists(className, classLoader, methodName, parameterTypes);
+    }
+
+    public Method findMethodBestMatch(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+        return XposedHelpers.findMethodBestMatch(clazz, methodName, parameterTypes);
     }
 }
