@@ -8,7 +8,9 @@ import com.wrbug.jsposed.jscall.JavaMethod;
 
 import org.mozilla.javascript.Function;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,23 +39,37 @@ public class JsPosedHelpers extends JavaMethod {
     }
 
     public Class<?> findClass(String className, ClassLoader classLoader) {
-        log("findClass : " + className);
         return XposedHelpers.findClassIfExists(className, classLoader);
     }
 
     public Object getObjectField(Object o, String fieldName) {
-        log("getObjectField : " + o + " " + fieldName);
         return XposedHelpers.getObjectField(o, fieldName);
 
     }
 
+    public Object newInstance(String className, Object[] args) {
+        return newInstance(className, XposedHelpers.getParameterTypes(args), args);
+    }
+
+    public Object newInstance(String className, Object[] parameterTypes, Object[] args) {
+        Class[] classes = ClassUtils.toClass(mParam.classLoader, parameterTypes);
+        try {
+            Class<?> aClass = mParam.classLoader.loadClass(className);
+            Constructor<?> constructor = XposedHelpers.findConstructorBestMatch(aClass, classes);
+            if (constructor == null) {
+                return null;
+            }
+            return constructor.newInstance(ClassUtils.convertObject(classes, args));
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
     public Object callMethod(Object o, String methodName, Object[] args) {
-        log("callMethod : " + o + " " + methodName + " " + Arrays.toString(args));
         return XposedHelpers.callMethod(o, methodName, args);
     }
 
     public Object callMethod(Object o, String methodName, Object[] classType, Object[] args) {
-        log("callMethod : " + o + " " + methodName + " " + Arrays.toString(args));
         Class[] classes = ClassUtils.toClass(mParam.classLoader, classType);
         args = ClassUtils.convertObject(classes, args);
         return XposedHelpers.callMethod(o, methodName, classes, args);
@@ -69,12 +85,10 @@ public class JsPosedHelpers extends JavaMethod {
     }
 
     public Field findField(Class<?> clazz, String fieldName) {
-        log("findField : " + clazz + " " + fieldName);
         return XposedHelpers.findFieldIfExists(clazz, fieldName);
     }
 
     public Field findFirstFieldByExactType(Class<?> clazz, Class<?> type) {
-        log("findFirstFieldByExactType : ");
         try {
             return XposedHelpers.findFirstFieldByExactType(clazz, type);
         } catch (Exception e) {
@@ -84,20 +98,17 @@ public class JsPosedHelpers extends JavaMethod {
     }
 
     public XC_MethodHook.Unhook findAndHookMethod(Class<?> clazz, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
-        log("findAndHookMethod clazz:" + clazz + " " + methodName + " " + Arrays.toString(argType));
         Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
         return XposedHelpers.findAndHookMethod(clazz, methodName, array);
     }
 
     public XC_MethodHook.Unhook findAndHookMethod(String className, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
         Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
-        log("findAndHookMethod className:" + className + " " + methodName + " " + Arrays.toString(array));
         return XposedHelpers.findAndHookMethod(className, mParam.classLoader, methodName, array);
     }
 
     public XC_MethodHook.Unhook findAndHookMethod(String className, ClassLoader classLoader, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
         Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
-        log("findAndHookMethod classLoader:" + classLoader + " " + className + " " + methodName + " " + Arrays.toString(array));
         return XposedHelpers.findAndHookMethod(className, classLoader, methodName, array);
     }
 

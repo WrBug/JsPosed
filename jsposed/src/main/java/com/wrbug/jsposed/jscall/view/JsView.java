@@ -3,7 +3,7 @@ package com.wrbug.jsposed.jscall.view;
 import android.view.View;
 
 import com.wrbug.jsposed.JsPosedExecutor;
-import com.wrbug.jsposed.NumberUtils;
+import com.wrbug.jsposed.JsNumberUtils;
 import com.wrbug.jsposed.jscall.JavaMethod;
 
 import org.mozilla.javascript.Function;
@@ -53,7 +53,7 @@ public class JsView extends JavaMethod {
     }
 
     public void setVisibility(View view, Object visibility) {
-        view.setVisibility(NumberUtils.toNumber(visibility).intValue());
+        view.setVisibility(JsNumberUtils.toNumber(visibility).intValue());
     }
 
     public boolean isEnabled(View view) {
@@ -69,7 +69,7 @@ public class JsView extends JavaMethod {
     }
 
     public void setPadding(View view, Object left, Object top, Object right, Object bottom) {
-        view.setPadding(NumberUtils.toNumber(left).intValue(), NumberUtils.toNumber(top).intValue(), NumberUtils.toNumber(right).intValue(), NumberUtils.toNumber(bottom).intValue());
+        view.setPadding(JsNumberUtils.toNumber(left).intValue(), JsNumberUtils.toNumber(top).intValue(), JsNumberUtils.toNumber(right).intValue(), JsNumberUtils.toNumber(bottom).intValue());
     }
 
 }

@@ -4,7 +4,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.wrbug.jsposed.JsPosedExecutor;
-import com.wrbug.jsposed.NumberUtils;
+import com.wrbug.jsposed.JsNumberUtils;
 
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -23,12 +23,12 @@ public class JsViewGroup extends JsView {
     }
 
     public void addView(ViewGroup viewGroup, View child, Object index) {
-        viewGroup.addView(child, NumberUtils.toNumber(index).intValue());
+        viewGroup.addView(child, JsNumberUtils.toNumber(index).intValue());
 
     }
 
     public void addView(ViewGroup viewGroup, View child, Object width, Object height) {
-        viewGroup.addView(child, NumberUtils.toNumber(width).intValue(), NumberUtils.toNumber(height).intValue());
+        viewGroup.addView(child, JsNumberUtils.toNumber(width).intValue(), JsNumberUtils.toNumber(height).intValue());
     }
 
     public void addView(ViewGroup viewGroup, View child, ViewGroup.LayoutParams params) {
@@ -36,7 +36,7 @@ public class JsViewGroup extends JsView {
     }
 
     public void addView(ViewGroup viewGroup, View child, Object index, ViewGroup.LayoutParams params) {
-        viewGroup.addView(child, NumberUtils.toNumber(index).intValue(), params);
+        viewGroup.addView(child, JsNumberUtils.toNumber(index).intValue(), params);
     }
 
     public void removeView(ViewGroup viewGroup, View view) {
@@ -48,15 +48,15 @@ public class JsViewGroup extends JsView {
     }
 
     public void removeViewsInLayout(ViewGroup viewGroup, Object start, Object count) {
-        viewGroup.removeViewsInLayout(NumberUtils.toNumber(start).intValue(), NumberUtils.toNumber(count).intValue());
+        viewGroup.removeViewsInLayout(JsNumberUtils.toNumber(start).intValue(), JsNumberUtils.toNumber(count).intValue());
     }
 
     public void removeViewAt(ViewGroup viewGroup, Object index) {
-        viewGroup.removeViewAt(NumberUtils.toNumber(index).intValue());
+        viewGroup.removeViewAt(JsNumberUtils.toNumber(index).intValue());
     }
 
     public void removeViews(ViewGroup viewGroup, Object start, Object count) {
-        viewGroup.removeViews(NumberUtils.toNumber(start).intValue(), NumberUtils.toNumber(count).intValue());
+        viewGroup.removeViews(JsNumberUtils.toNumber(start).intValue(), JsNumberUtils.toNumber(count).intValue());
     }
 
     public void removeAllViews(ViewGroup viewGroup) {
@@ -68,7 +68,7 @@ public class JsViewGroup extends JsView {
     }
 
     public View getChildAt(ViewGroup viewGroup, Object index) {
-        return viewGroup.getChildAt(NumberUtils.toNumber(index).intValue());
+        return viewGroup.getChildAt(JsNumberUtils.toNumber(index).intValue());
 
     }
 }

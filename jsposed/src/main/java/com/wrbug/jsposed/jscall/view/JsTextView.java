@@ -4,7 +4,7 @@ import android.text.Html;
 import android.widget.TextView;
 
 import com.wrbug.jsposed.JsPosedExecutor;
-import com.wrbug.jsposed.NumberUtils;
+import com.wrbug.jsposed.JsNumberUtils;
 
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -26,7 +26,7 @@ public class JsTextView extends JsView {
     }
 
     public void setText(TextView textView, Object id) {
-        textView.setText(NumberUtils.toNumber(id).intValue());
+        textView.setText(JsNumberUtils.toNumber(id).intValue());
     }
 
     public int length(TextView textView) {
@@ -38,15 +38,15 @@ public class JsTextView extends JsView {
     }
 
     public void setTextSize(TextView textView, Object size) {
-        textView.setTextSize(NumberUtils.toNumber(size).floatValue());
+        textView.setTextSize(JsNumberUtils.toNumber(size).floatValue());
     }
 
     public void setTextColor(TextView textView, Object color) {
-        textView.setTextColor(NumberUtils.toNumber(color).intValue());
+        textView.setTextColor(JsNumberUtils.toNumber(color).intValue());
     }
 
     public final void setHint(TextView textView, Object resid) {
-        textView.setHint(NumberUtils.toNumber(resid).intValue());
+        textView.setHint(JsNumberUtils.toNumber(resid).intValue());
     }
 
     public final void setHint(TextView textView, String hint) {
@@ -58,6 +58,6 @@ public class JsTextView extends JsView {
     }
 
     public void setInputType(TextView textView, Object type) {
-        textView.setInputType(NumberUtils.toNumber(type).intValue());
+        textView.setInputType(JsNumberUtils.toNumber(type).intValue());
     }
 }

@@ -1,8 +1,5 @@
 package com.wrbug.jsposed;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 public class ClassUtils {
 
     public static Class[] toClass(ClassLoader classLoader, Object[] clzs) {
@@ -98,9 +95,9 @@ public class ClassUtils {
         }
         for (int i = 0; i < args.length; i++) {
             if (args[i] instanceof Number) {
-                args[i] = NumberUtils.convertNumber(classes[i], ((Number) args[i]));
+                args[i] = JsNumberUtils.convertNumber(classes[i], ((Number) args[i]));
             } else if (args[i] instanceof String && isNumberClass(classes[i])) {
-                args[i] = NumberUtils.convertNumber(classes[i], ((String) args[i]));
+                args[i] = JsNumberUtils.convertNumber(classes[i], ((String) args[i]));
             }
         }
         return args;

@@ -8,8 +8,67 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class NumberUtils {
+
+/**
+ *
+ *
+ */
+public class JsNumberUtils {
     private static Map<String, Number> sNumberMap = new HashMap<>();
+
+    public static boolean isInt(String str) {
+        if (!isNumber(str)) {
+            return false;
+        }
+        long value = toLong(str);
+        return value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE;
+    }
+
+    /**
+     * 1234L or 1234l
+     *
+     * @param str
+     * @return
+     */
+    public static boolean isLong(String str) {
+        if (TextUtils.isEmpty(str)) {
+            return false;
+        }
+        if (!str.endsWith("L") && !str.endsWith("l")) {
+            return false;
+        }
+        str = str.substring(0, str.length() - 1);
+        if (!isNumber(str)) {
+            return false;
+        }
+        double value = toDouble(str);
+        return value <= Long.MAX_VALUE && value >= Long.MIN_VALUE;
+    }
+
+    /**
+     * 1234F or 1234.1f
+     *
+     * @param str
+     * @return
+     */
+    public static boolean isFloat(String str) {
+        if (TextUtils.isEmpty(str)) {
+            return false;
+        }
+        if (!str.endsWith("F") && !str.endsWith("f")) {
+            return false;
+        }
+        str = str.substring(0, str.length() - 1);
+        if (!isDecimal(str)) {
+            return false;
+        }
+        double value = toDouble(str);
+        return value <= Float.MAX_VALUE && value >= Float.MIN_VALUE;
+    }
+
+    public static boolean isDouble(String str) {
+        return isDecimal(str);
+    }
 
     public static boolean isNumber(String str) {
         if (TextUtils.isEmpty(str)) {
@@ -49,8 +108,10 @@ public class NumberUtils {
             BigInteger number = new BigInteger(str.substring(2), 16);
             sNumberMap.put(str, number);
             return number;
-        } else if (isDecimal(str)) {
-            BigDecimal bigDecimal = new BigDecimal(str);
+        } else if (isFloat(str) || isLong(str) || isDecimal(str)) {
+            String num = str.replace("F", "").replace("f", "")
+                    .replace("L", "").replace("l", "");
+            BigDecimal bigDecimal = new BigDecimal(num);
             sNumberMap.put(str, bigDecimal);
             return bigDecimal;
         }
@@ -84,10 +145,12 @@ public class NumberUtils {
 
     public static Number convertNumber(Class clazz, String data) {
         Number number = null;
-        if (NumberUtils.isHex(data)) {
+        if (JsNumberUtils.isHex(data)) {
             number = new BigInteger(data.substring(2), 16);
-        } else if (NumberUtils.isDecimal(data)) {
-            number = new BigDecimal(data);
+        } else if (isFloat(data) || isLong(data) || isDecimal(data)) {
+            String num = data.replace("F", "").replace("f", "")
+                    .replace("L", "").replace("l", "");
+            number = new BigDecimal(num);
         }
         return convertNumber(clazz, number);
     }

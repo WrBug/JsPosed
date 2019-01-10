@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
-import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class XposedInit implements IXposedHookLoadPackage {
@@ -18,7 +17,7 @@ public class XposedInit implements IXposedHookLoadPackage {
         if (TextUtils.isEmpty(str)) {
             return;
         }
-        JsPosedExecutor executor = JsPosedExecutor.init(lpparam, str);
+        JsPosedExecutor executor = JsPosedExecutor.init(lpparam, str, lpparam.packageName.equals("com.wrbug.jsposed"));
         executor.run("start()");
     }
 
