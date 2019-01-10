@@ -21,17 +21,30 @@ public class JsView extends JavaMethod {
     }
 
     public void setOnclickListener(View view, final Function function) {
-        view.setOnClickListener(v -> mJsPosedExecutor.call(function, v));
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mJsPosedExecutor.call(function, v);
+            }
+        });
     }
 
     public void setOnFocusChangeListener(View view, final Function function) {
-        view.setOnFocusChangeListener((v, hasFocus) -> mJsPosedExecutor.call(function, v, hasFocus));
+        view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                mJsPosedExecutor.call(function, v, hasFocus);
+            }
+        });
     }
 
     public void setOnLongClickListener(View view, final Function function) {
-        view.setOnLongClickListener(v -> {
-            mJsPosedExecutor.call(function, v);
-            return false;
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mJsPosedExecutor.call(function, v);
+                return false;
+            }
         });
     }
 

@@ -25,8 +25,13 @@ public class JsCompoundButton extends JsTextView {
         button.setChecked(checked);
     }
 
-    public void setOnCheckedChangeListener(CompoundButton button, Function function) {
-        button.setOnCheckedChangeListener((buttonView, isChecked) -> mJsPosedExecutor.call(function, buttonView, isChecked));
+    public void setOnCheckedChangeListener(CompoundButton button, final Function function) {
+        button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mJsPosedExecutor.call(function, buttonView, isChecked);
+            }
+        });
     }
 
 

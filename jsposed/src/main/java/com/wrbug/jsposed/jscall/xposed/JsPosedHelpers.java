@@ -91,14 +91,14 @@ public class JsPosedHelpers extends JavaMethod {
 
     public XC_MethodHook.Unhook findAndHookMethod(String className, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
         Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
-        log("findAndHookMethod className:" + className + " " + methodName + " " + Arrays.toString(argType));
-        return XposedHelpers.findAndHookMethod(className, mParam.classLoader, methodName, argType, array);
+        log("findAndHookMethod className:" + className + " " + methodName + " " + Arrays.toString(array));
+        return XposedHelpers.findAndHookMethod(className, mParam.classLoader, methodName, array);
     }
 
     public XC_MethodHook.Unhook findAndHookMethod(String className, ClassLoader classLoader, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
         Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
-        log("findAndHookMethod classLoader:" + classLoader + " " + className + " " + methodName + " " + Arrays.toString(argType));
-        return XposedHelpers.findAndHookMethod(className, classLoader, methodName, argType, array);
+        log("findAndHookMethod classLoader:" + classLoader + " " + className + " " + methodName + " " + Arrays.toString(array));
+        return XposedHelpers.findAndHookMethod(className, classLoader, methodName, array);
     }
 
     public Method findMethodExact(Class<?> clazz, String methodName, Object[] parameterTypes) {
