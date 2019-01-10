@@ -98,9 +98,9 @@ public class ClassUtils {
         }
         for (int i = 0; i < args.length; i++) {
             if (args[i] instanceof Number) {
-                args[i] = convertNumber(classes[i], ((Number) args[i]));
+                args[i] = NumberUtils.convertNumber(classes[i], ((Number) args[i]));
             } else if (args[i] instanceof String && isNumberClass(classes[i])) {
-                args[i] = convertNumber(classes[i], ((String) args[i]));
+                args[i] = NumberUtils.convertNumber(classes[i], ((String) args[i]));
             }
         }
         return args;
@@ -116,38 +116,4 @@ public class ClassUtils {
                 clazz == short.class;
     }
 
-    public static Number convertNumber(Class clazz, String data) {
-        Number number = null;
-        if (StringUtils.isHex(data)) {
-            number = new BigInteger(data.substring(2), 16);
-        } else if (StringUtils.isDecimal(data)) {
-            number = new BigDecimal(data);
-        }
-        return convertNumber(clazz, number);
-    }
-
-    public static Number convertNumber(Class clazz, Number data) {
-        if (clazz == null || data == null) {
-            return 0;
-        }
-        if (clazz == Integer.class || clazz == int.class) {
-            return data.intValue();
-        }
-        if (clazz == Long.class || clazz == long.class) {
-            return data.longValue();
-        }
-        if (clazz == Float.class || clazz == float.class) {
-            return data.floatValue();
-        }
-        if (clazz == Double.class || clazz == double.class) {
-            return data.doubleValue();
-        }
-        if (clazz == Byte.class || clazz == byte.class) {
-            return data.byteValue();
-        }
-        if (clazz == Short.class || clazz == short.class) {
-            return data.shortValue();
-        }
-        return 0;
-    }
 }

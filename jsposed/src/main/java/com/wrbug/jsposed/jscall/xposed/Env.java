@@ -1,17 +1,23 @@
-package com.wrbug.jsposed;
+package com.wrbug.jsposed.jscall.xposed;
 
 import android.content.pm.ApplicationInfo;
+
+import com.wrbug.jsposed.JsPosedExecutor;
+import com.wrbug.jsposed.jscall.JavaMethod;
 
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-public class Env {
-    private JsPosedExecutor mJsPosedExecutor;
-    private XC_LoadPackage.LoadPackageParam mParam;
+public class Env extends JavaMethod {
+
 
     public Env(JsPosedExecutor jsPosedExecutor, XC_LoadPackage.LoadPackageParam param) {
-        mJsPosedExecutor = jsPosedExecutor;
-        mParam = param;
+        super(jsPosedExecutor, param);
+    }
+
+    @Override
+    public String getName() {
+        return "Env";
     }
 
     public String packageName() {

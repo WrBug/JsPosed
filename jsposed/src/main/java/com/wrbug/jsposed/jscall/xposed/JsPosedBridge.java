@@ -1,4 +1,8 @@
-package com.wrbug.jsposed;
+package com.wrbug.jsposed.jscall.xposed;
+
+import com.wrbug.jsposed.CommonMethodHook;
+import com.wrbug.jsposed.JsPosedExecutor;
+import com.wrbug.jsposed.jscall.JavaMethod;
 
 import org.mozilla.javascript.Function;
 
@@ -9,16 +13,16 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-public class JsPosedBridge {
-    private JsPosedExecutor mJsPosedExecutor;
-    private XC_LoadPackage.LoadPackageParam mParam;
+public class JsPosedBridge extends JavaMethod {
 
     public JsPosedBridge(JsPosedExecutor jsPosedExecutor, XC_LoadPackage.LoadPackageParam param) {
-        mJsPosedExecutor = jsPosedExecutor;
-        mParam = param;
-
+        super(jsPosedExecutor, param);
     }
 
+    @Override
+    public String getName() {
+        return "JsPosedBridge";
+    }
 
     public void log(Object msg) {
         XposedBridge.log(String.valueOf(msg));

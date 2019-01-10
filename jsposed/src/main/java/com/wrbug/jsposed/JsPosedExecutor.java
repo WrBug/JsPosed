@@ -2,6 +2,15 @@ package com.wrbug.jsposed;
 
 import android.text.TextUtils;
 
+import com.wrbug.jsposed.jscall.view.JsCompoundButton;
+import com.wrbug.jsposed.jscall.view.JsTextView;
+import com.wrbug.jsposed.jscall.view.JsView;
+import com.wrbug.jsposed.jscall.view.JsViewGroup;
+import com.wrbug.jsposed.jscall.xposed.Env;
+import com.wrbug.jsposed.jscall.JavaMethod;
+import com.wrbug.jsposed.jscall.xposed.JsPosedBridge;
+import com.wrbug.jsposed.jscall.xposed.JsPosedHelpers;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
@@ -36,9 +45,11 @@ public class JsPosedExecutor {
         mContext = Context.enter();
         mContext.setOptimizationLevel(-1);
         scope = mContext.initSafeStandardObjects();
-        ScriptableObject.putProperty(scope, "JsPosedBridge", Context.javaToJS(new JsPosedBridge(this, param), scope));
-        ScriptableObject.putProperty(scope, "JsPosedHelpers", Context.javaToJS(new JsPosedHelpers(this, param), scope));
-        ScriptableObject.putProperty(scope, "Env", Context.javaToJS(new Env(this, param), scope));
+        addJavaMethod(new JsPosedBridge(this, param));
+        addJavaMethod(new JsPosedHelpers(this, param));
+        addJavaMethod(new Env(this, param));
+        addJavaMethod(new JsCompoundButton(this, param));
+        addJavaMethod(new JsViewGroup(this, param));
         run(js);
     }
 
@@ -68,5 +79,13 @@ public class JsPosedExecutor {
         } catch (Throwable t) {
             XposedBridge.log(t);
         }
+    }
+
+    public void addJavaMethod(JavaMethod javaMethod) {
+        if (javaMethod == null) {
+            return;
+        }
+        ScriptableObject.putProperty(scope, javaMethod.getName(), Context.javaToJS(javaMethod, scope));
+
     }
 }
