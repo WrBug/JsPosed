@@ -22,21 +22,21 @@ public class JsViewGroup extends JsView {
         viewGroup.addView(child);
     }
 
-    public void addView(ViewGroup viewGroup, View child, Object index) {
-        viewGroup.addView(child, JsNumberUtils.toNumber(index).intValue());
+    public void addView(ViewGroup viewGroup, View child, long index) {
+        viewGroup.addView(child, (int) index);
 
     }
 
-    public void addView(ViewGroup viewGroup, View child, Object width, Object height) {
-        viewGroup.addView(child, JsNumberUtils.toNumber(width).intValue(), JsNumberUtils.toNumber(height).intValue());
+    public void addView(ViewGroup viewGroup, View child, long width, long height) {
+        viewGroup.addView(child, ((int) width), (int) height);
     }
 
     public void addView(ViewGroup viewGroup, View child, ViewGroup.LayoutParams params) {
         viewGroup.addView(child, params);
     }
 
-    public void addView(ViewGroup viewGroup, View child, Object index, ViewGroup.LayoutParams params) {
-        viewGroup.addView(child, JsNumberUtils.toNumber(index).intValue(), params);
+    public void addView(ViewGroup viewGroup, View child, long index, ViewGroup.LayoutParams params) {
+        viewGroup.addView(child, (int) index, params);
     }
 
     public void removeView(ViewGroup viewGroup, View view) {
@@ -47,16 +47,16 @@ public class JsViewGroup extends JsView {
         viewGroup.removeViewInLayout(view);
     }
 
-    public void removeViewsInLayout(ViewGroup viewGroup, Object start, Object count) {
-        viewGroup.removeViewsInLayout(JsNumberUtils.toNumber(start).intValue(), JsNumberUtils.toNumber(count).intValue());
+    public void removeViewsInLayout(ViewGroup viewGroup, long start, long count) {
+        viewGroup.removeViewsInLayout((int) start, ((int) count));
     }
 
-    public void removeViewAt(ViewGroup viewGroup, Object index) {
-        viewGroup.removeViewAt(JsNumberUtils.toNumber(index).intValue());
+    public void removeViewAt(ViewGroup viewGroup, long index) {
+        viewGroup.removeViewAt((int) index);
     }
 
-    public void removeViews(ViewGroup viewGroup, Object start, Object count) {
-        viewGroup.removeViews(JsNumberUtils.toNumber(start).intValue(), JsNumberUtils.toNumber(count).intValue());
+    public void removeViews(ViewGroup viewGroup, long start, long count) {
+        viewGroup.removeViews(((int) start), (int) count);
     }
 
     public void removeAllViews(ViewGroup viewGroup) {
@@ -67,8 +67,8 @@ public class JsViewGroup extends JsView {
         return viewGroup.getChildCount();
     }
 
-    public View getChildAt(ViewGroup viewGroup, Object index) {
-        return viewGroup.getChildAt(JsNumberUtils.toNumber(index).intValue());
+    public View getChildAt(ViewGroup viewGroup, long index) {
+        return viewGroup.getChildAt((int) index);
 
     }
 }

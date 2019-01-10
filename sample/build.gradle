@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
+    //编译需注释
+    signingConfigs {
+        releaseConfig
+    }
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.wrbug.jsposed"
@@ -11,6 +15,11 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            if (signingConfigs.releaseConfig != null) {
+                signingConfig signingConfigs.releaseConfig
+            }
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -29,3 +38,28 @@ dependencies {
     implementation 'org.mozilla:rhino:1.7.10'
     implementation project(':jsposed')
 }
+
+
+
+
+Properties props = new Properties()
+def propFile = file('../signing.properties')
+if (propFile.canRead()) {
+    props.load(new FileInputStream(propFile))
+    if (props != null &&
+            props.containsKey('SIGN_FILE') && props.containsKey('SIGN_PASSWORD') &&
+            props.containsKey('KEY_ALIAS') && props.containsKey('KEY_PASSWORD')) {
+        android.signingConfigs.releaseConfig.storeFile = file(props['SIGN_FILE'])
+        android.signingConfigs.releaseConfig.storePassword = props['SIGN_PASSWORD']
+        android.signingConfigs.releaseConfig.keyAlias = props['KEY_ALIAS']
+        android.signingConfigs.releaseConfig.keyPassword = props['KEY_PASSWORD']
+    } else {
+        println 'release build not found signing properties'
+        android.buildTypes.release.signingConfig = null
+    }
+} else {
+    println 'release build not found signing file'
+    android.buildTypes.release.signingConfig = null
+}
+
+

@@ -27,27 +27,34 @@ public class ClassUtils {
         return arr;
     }
 
+    public static Class toClass(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        Class c = null;
+        if (obj instanceof String) {
+            c = checkIsPrimitive(obj);
+            if (c == null) {
+                try {
+                    c = Class.forName((String) obj);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (obj instanceof Class) {
+            c = (Class) obj;
+        }
+        return c;
+    }
+
     public static Class[] toClass(Object[] clzs) {
         if (clzs == null) {
             return null;
         }
         Class[] arr = new Class[clzs.length];
         for (int i = 0; i < clzs.length; i++) {
-            Class c = null;
             Object clz = clzs[i];
-            if (clz instanceof String) {
-                c = checkIsPrimitive(clz);
-                if (c == null) {
-                    try {
-                        c = Class.forName((String) clz);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else if (clz instanceof Class) {
-                c = (Class) clz;
-            }
-            arr[i] = c;
+            arr[i] = toClass(clz);
         }
         return arr;
     }

@@ -52,8 +52,8 @@ public class JsView extends JavaMethod {
         return view.performLongClick();
     }
 
-    public void setVisibility(View view, Object visibility) {
-        view.setVisibility(JsNumberUtils.toNumber(visibility).intValue());
+    public void setVisibility(View view, long visibility) {
+        view.setVisibility((int) visibility);
     }
 
     public boolean isEnabled(View view) {
@@ -68,8 +68,8 @@ public class JsView extends JavaMethod {
         view.setFocusable(focusable);
     }
 
-    public void setPadding(View view, Object left, Object top, Object right, Object bottom) {
-        view.setPadding(JsNumberUtils.toNumber(left).intValue(), JsNumberUtils.toNumber(top).intValue(), JsNumberUtils.toNumber(right).intValue(), JsNumberUtils.toNumber(bottom).intValue());
+    public void setPadding(View view, Number left, Number top, Number right, Number bottom) {
+        view.setPadding(left.intValue(), top.intValue(), right.intValue(), bottom.intValue());
     }
 
 }
