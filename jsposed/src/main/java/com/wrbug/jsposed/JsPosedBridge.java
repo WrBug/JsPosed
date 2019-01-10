@@ -20,8 +20,8 @@ public class JsPosedBridge {
     }
 
 
-    public void log(String msg) {
-        XposedBridge.log(msg);
+    public void log(Object msg) {
+        XposedBridge.log(String.valueOf(msg));
     }
 
     public void log(Throwable throwable) {

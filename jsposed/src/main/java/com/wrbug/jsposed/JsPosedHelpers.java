@@ -46,7 +46,18 @@ public class JsPosedHelpers {
 
     public Object callMethod(Object o, String methodName, Object[] classType, Object[] args) {
         log("callMethod : " + o + " " + methodName + " " + Arrays.toString(args));
-        return XposedHelpers.callMethod(o, methodName, args);
+        Class[] classes = ClassUtils.toClass(mParam.classLoader, classType);
+        args = ClassUtils.convertObject(classes, args);
+        return XposedHelpers.callMethod(o, methodName, classes, args);
+    }
+
+    public Method findMethodBestMatch(Class<?> clazz, String methodName, Object[] args) {
+        return XposedHelpers.findMethodBestMatch(clazz, methodName, args);
+    }
+
+    public Method findMethodBestMatch(Class<?> clazz, String methodName, Object[] parameterTypes, Object[] args) {
+        Class[] classes = ClassUtils.toClass(mParam.classLoader, parameterTypes);
+        return XposedHelpers.findMethodBestMatch(clazz, methodName, classes, args);
     }
 
     public Field findField(Class<?> clazz, String fieldName) {
