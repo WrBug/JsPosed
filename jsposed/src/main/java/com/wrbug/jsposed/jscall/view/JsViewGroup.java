@@ -9,9 +9,7 @@ import com.wrbug.jsposed.JsNumberUtils;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class JsViewGroup extends JsView {
-    public JsViewGroup(JsPosedExecutor jsPosedExecutor, XC_LoadPackage.LoadPackageParam param) {
-        super(jsPosedExecutor, param);
-    }
+
 
     @Override
     public String getName() {

@@ -57,13 +57,13 @@ public class JsPosedExecutor {
         mContext = Context.enter();
         mContext.setOptimizationLevel(-1);
         scope = mContext.initSafeStandardObjects();
-        addJavaMethod(new JsPosedBridge(this, param));
-        addJavaMethod(new JsPosedHelpers(this, param));
-        addJavaMethod(new Env(this, param));
-        addJavaMethod(new JsCompoundButton(this, param));
-        addJavaMethod(new JsViewGroup(this, param));
-        addJavaMethod(new JsContext(this, param));
-        addJavaMethod(new JsMap(this, param));
+        addJavaMethod(new JsPosedBridge());
+        addJavaMethod(new JsPosedHelpers());
+        addJavaMethod(new Env());
+        addJavaMethod(new JsCompoundButton());
+        addJavaMethod(new JsViewGroup());
+        addJavaMethod(new JsContext());
+        addJavaMethod(new JsMap());
         run(js);
     }
 
@@ -140,6 +140,8 @@ public class JsPosedExecutor {
         if (javaMethod == null) {
             return;
         }
+        javaMethod.setJsPosedExecutor(this);
+        javaMethod.setParam(mParam);
         ScriptableObject.putProperty(scope, javaMethod.getName(), Context.javaToJS(javaMethod, scope));
 
     }

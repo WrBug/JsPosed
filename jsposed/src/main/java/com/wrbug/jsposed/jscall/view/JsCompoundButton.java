@@ -9,9 +9,7 @@ import org.mozilla.javascript.Function;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class JsCompoundButton extends JsTextView {
-    public JsCompoundButton(JsPosedExecutor jsPosedExecutor, XC_LoadPackage.LoadPackageParam param) {
-        super(jsPosedExecutor, param);
-    }
+
 
     public void toggle(CompoundButton button) {
         button.toggle();

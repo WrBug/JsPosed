@@ -25,10 +25,6 @@ import static com.wrbug.jsposed.LogUtils.log;
 
 public class JsPosedHelpers extends JavaMethod {
 
-    public JsPosedHelpers(JsPosedExecutor jsPosedExecutor, XC_LoadPackage.LoadPackageParam param) {
-        super(jsPosedExecutor, param);
-    }
-
     @Override
     public String getName() {
         return "JsPosedHelpers";

@@ -20,6 +20,7 @@ public class XposedInit implements IXposedHookLoadPackage {
             return;
         }
         JsPosedExecutor executor = JsPosedExecutor.init(lpparam, str, lpparam.packageName.equals("com.wrbug.jsposed"));
+        executor.addJavaMethod(new Test());
         executor.run("start()");
     }
 

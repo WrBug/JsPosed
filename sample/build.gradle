@@ -39,7 +39,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     compileOnly 'de.robv.android.xposed:api:82'
-    api project(':jsposed')
+//    implementation 'com.wrbug:jsposed:0.0.1'
+    implementation project(':jsposed')
 }
 
 

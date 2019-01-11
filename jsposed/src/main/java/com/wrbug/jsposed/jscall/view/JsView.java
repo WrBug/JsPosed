@@ -11,9 +11,6 @@ import org.mozilla.javascript.Function;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class JsView extends JavaMethod {
-    public JsView(JsPosedExecutor jsPosedExecutor, XC_LoadPackage.LoadPackageParam param) {
-        super(jsPosedExecutor, param);
-    }
 
     @Override
     public String getName() {

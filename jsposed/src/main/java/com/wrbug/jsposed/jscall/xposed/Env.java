@@ -11,10 +11,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public class Env extends JavaMethod {
 
 
-    public Env(JsPosedExecutor jsPosedExecutor, XC_LoadPackage.LoadPackageParam param) {
-        super(jsPosedExecutor, param);
-    }
-
     @Override
     public String getName() {
         return "Env";

@@ -33,3 +33,19 @@ dependencies {
     implementation 'org.mozilla:rhino:1.7.10'
     compileOnly 'de.robv.android.xposed:api:82'
 }
+
+
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+    }
+}
+
+// This script was used to upload files to bintray.
+// Note: please put it on the bottm.
+apply from: 'bintray.gradle'

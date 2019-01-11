@@ -15,9 +15,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class JsPosedBridge extends JavaMethod {
 
-    public JsPosedBridge(JsPosedExecutor jsPosedExecutor, XC_LoadPackage.LoadPackageParam param) {
-        super(jsPosedExecutor, param);
-    }
+
 
     @Override
     public String getName() {

@@ -10,9 +10,7 @@ import com.wrbug.jsposed.JsNumberUtils;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class JsTextView extends JsView {
-    public JsTextView(JsPosedExecutor jsPosedExecutor, XC_LoadPackage.LoadPackageParam param) {
-        super(jsPosedExecutor, param);
-    }
+
 
     public String getText(TextView textView) {
         return textView.getText().toString();

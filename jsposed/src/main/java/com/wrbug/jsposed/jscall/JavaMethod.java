@@ -8,8 +8,11 @@ public abstract class JavaMethod {
     protected JsPosedExecutor mJsPosedExecutor;
     protected XC_LoadPackage.LoadPackageParam mParam;
 
-    public JavaMethod(JsPosedExecutor jsPosedExecutor, XC_LoadPackage.LoadPackageParam param) {
+    public void setJsPosedExecutor(JsPosedExecutor jsPosedExecutor) {
         mJsPosedExecutor = jsPosedExecutor;
+    }
+
+    public void setParam(XC_LoadPackage.LoadPackageParam param) {
         mParam = param;
     }
 
