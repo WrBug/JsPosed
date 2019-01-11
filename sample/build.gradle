@@ -16,6 +16,7 @@ android {
     }
     buildTypes {
         debug {
+            minifyEnabled false
             if (signingConfigs.releaseConfig != null) {
                 signingConfig signingConfigs.releaseConfig
             }
@@ -23,6 +24,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (signingConfigs.releaseConfig != null) {
+                signingConfig signingConfigs.releaseConfig
+            }
         }
     }
 }
@@ -35,8 +39,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     compileOnly 'de.robv.android.xposed:api:82'
-    implementation 'org.mozilla:rhino:1.7.10'
-    implementation project(':jsposed')
+    api project(':jsposed')
 }
 
 

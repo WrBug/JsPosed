@@ -1,4 +1,4 @@
-package com.wrbug.jsposed;
+package com.wrbug.jsposeddemo;
 
 import org.junit.Test;
 

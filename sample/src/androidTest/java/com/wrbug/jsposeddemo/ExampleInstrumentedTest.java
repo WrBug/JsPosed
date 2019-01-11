@@ -1,4 +1,4 @@
-package com.wrbug.jsposed;
+package com.wrbug.jsposeddemo;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

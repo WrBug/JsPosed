@@ -1,6 +1,8 @@
-package com.wrbug.jsposed;
+package com.wrbug.jsposeddemo;
 
 import android.text.TextUtils;
+
+import com.wrbug.jsposed.JsPosedExecutor;
 
 import java.io.File;
 import java.io.FileReader;

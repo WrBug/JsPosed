@@ -40,6 +40,10 @@ public class JsContext extends JavaMethod {
         return activity.findViewById((int) id);
     }
 
+    public View findViewById(Activity activity, String idName) {
+        return activity.findViewById(activity.getResources().getIdentifier(idName, "id", activity.getPackageName()));
+    }
+
     public void startActivity(Context context, String targetActivity, Map<String, Object> bundle) {
         Intent intent = new Intent();
         intent.setClassName(context, targetActivity);

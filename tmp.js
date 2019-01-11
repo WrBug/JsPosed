@@ -5,11 +5,15 @@ function start() {
     }
     JsPosedBridge.log("Jsposed running");
     JsPosedBridge.log("loadPackage", Env.packageName());
-    JsPosedHelpers.findAndHookMethod("com.wrbug.jsposed.MainActivity", "onCreate", ["android.os.Bundle"], null, function (methodHookParam) {
+    mainHook();
+    main2Hook();
+}
+function mainHook(){
+    JsPosedHelpers.findAndHookMethod("com.wrbug.jsposeddemo.MainActivity", "onCreate", ["android.os.Bundle"], null, function (methodHookParam) {
         var activity = JsPosedHelpers.getObjectField(methodHookParam, "thisObject");
         var tv = JsPosedHelpers.getObjectField(activity, "tv");
         var checkbox = JsPosedHelpers.getObjectField(activity, "mCheckBox");
-        var btn = JsContext.findViewById(activity, 0x7f070022)
+        var btn = JsContext.findViewById(activity, "btn")
         JsView.setText(tv, "Jsposed running");
         JsView.setText(btn, "点击跳转");
         JsView.setTextColor(tv, 0xffff0000);
@@ -18,7 +22,7 @@ function start() {
             JsView.toggle(checkbox)
         });
         JsView.setOnclickListener(btn, function (view) {
-            JsContext.startActivity(activity, "com.wrbug.jsposed.Main2Activity", {
+            JsContext.startActivity(activity, "com.wrbug.jsposeddemo.Main2Activity", {
                 "a": "test1",
                 "b": ["test2","java.lang.String"],
                 "c": 12345,
@@ -29,11 +33,9 @@ function start() {
             JsView.setText(tv, "checkBox status:" + isChecked);
         })
     })
-    main2Hook();
 }
-
 function main2Hook() {
-    JsPosedHelpers.findAndHookMethod("com.wrbug.jsposed.Main2Activity", "onCreate", ["android.os.Bundle"], null, function (methodHookParam) {
+    JsPosedHelpers.findAndHookMethod("com.wrbug.jsposeddemo.Main2Activity", "onCreate", ["android.os.Bundle"], null, function (methodHookParam) {
         var activity = JsPosedHelpers.getObjectField(methodHookParam, "thisObject");
         var container = JsContext.findViewById(activity, 2131165229)
         var keys = ["a", "b", "c", "d"];
