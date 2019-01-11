@@ -57,7 +57,7 @@ js文本可以使用硬编码或通过文件的形式获取,使用文件时需�
 
 #### 简单js实现
 
-```
+``` javaScript
 function start(){
     var packageName = Env.packageName();
     if (packageName != "com.wrbug.jsposed") {
