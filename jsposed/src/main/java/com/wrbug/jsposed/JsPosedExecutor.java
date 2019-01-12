@@ -2,9 +2,10 @@ package com.wrbug.jsposed;
 
 import android.text.TextUtils;
 
+import com.wrbug.jsposed.jscall.context.JsActivity;
 import com.wrbug.jsposed.jscall.map.JsMap;
 import com.wrbug.jsposed.jscall.view.JsCompoundButton;
-import com.wrbug.jsposed.jscall.view.JsContext;
+import com.wrbug.jsposed.jscall.context.JsContext;
 import com.wrbug.jsposed.jscall.view.JsViewGroup;
 import com.wrbug.jsposed.jscall.xposed.Env;
 import com.wrbug.jsposed.jscall.JavaMethod;
@@ -16,6 +17,7 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +25,7 @@ import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class JsPosedExecutor {
@@ -31,7 +34,7 @@ public class JsPosedExecutor {
     private volatile static JsPosedExecutor instance;
     private Context mContext;
     private Scriptable scope;
-
+    private List<Class> javaMethods = new ArrayList<>();
 
     public static JsPosedExecutor init(XC_LoadPackage.LoadPackageParam param, String jsContent) {
         return init(param, jsContent, false);
@@ -62,7 +65,7 @@ public class JsPosedExecutor {
         addJavaMethod(new Env());
         addJavaMethod(new JsCompoundButton());
         addJavaMethod(new JsViewGroup());
-        addJavaMethod(new JsContext());
+        addJavaMethod(new JsActivity());
         addJavaMethod(new JsMap());
         run(js);
     }
@@ -140,9 +143,25 @@ public class JsPosedExecutor {
         if (javaMethod == null) {
             return;
         }
+        if (javaMethods.contains(javaMethod.getClass())) {
+            return;
+        }
         javaMethod.setJsPosedExecutor(this);
         javaMethod.setParam(mParam);
         ScriptableObject.putProperty(scope, javaMethod.getName(), Context.javaToJS(javaMethod, scope));
+        javaMethods.add(javaMethod.getClass());
+        Class<?> superclass = javaMethod.getClass().getSuperclass();
+        if (superclass != null && JavaMethod.class.isAssignableFrom(superclass) && JavaMethod.class != superclass && !javaMethods.contains(superclass)) {
+            try {
+                Constructor<?> constructor = XposedHelpers.findConstructorBestMatch(superclass);
+                if (constructor != null) {
+                    JavaMethod parentInstance = (JavaMethod) constructor.newInstance();
+                    addJavaMethod(parentInstance);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 }

@@ -27,6 +27,26 @@ public class ClassUtils {
         return arr;
     }
 
+    public static Class toClass(Object obj, ClassLoader classLoader) {
+        if (obj == null) {
+            return null;
+        }
+        Class c = null;
+        if (obj instanceof String) {
+            c = checkIsPrimitive(obj);
+            if (c == null) {
+                try {
+                    c = classLoader.loadClass((String) obj);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (obj instanceof Class) {
+            c = (Class) obj;
+        }
+        return c;
+    }
+
     public static Class toClass(Object obj) {
         if (obj == null) {
             return null;

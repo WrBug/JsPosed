@@ -1,12 +1,7 @@
 package com.wrbug.jsposed.jscall.map;
 
-import com.wrbug.jsposed.JsPosedExecutor;
 import com.wrbug.jsposed.jscall.JavaMethod;
-
 import java.util.Map;
-
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
-
 public class JsMap extends JavaMethod {
 
     @Override

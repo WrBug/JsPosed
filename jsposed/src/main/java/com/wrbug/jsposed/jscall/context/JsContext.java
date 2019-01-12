@@ -1,22 +1,16 @@
-package com.wrbug.jsposed.jscall.view;
+package com.wrbug.jsposed.jscall.context;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import com.wrbug.jsposed.ClassUtils;
-import com.wrbug.jsposed.JsPosedExecutor;
-import com.wrbug.jsposed.JsNumberUtils;
 import com.wrbug.jsposed.jscall.JavaMethod;
 
 import org.mozilla.javascript.NativeArray;
 
 import java.util.Map;
-
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class JsContext extends JavaMethod {
 
@@ -31,14 +25,6 @@ public class JsContext extends JavaMethod {
 
     public void toast(Context context, String msg) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-    }
-
-    public View findViewById(Activity activity, long id) {
-        return activity.findViewById((int) id);
-    }
-
-    public View findViewById(Activity activity, String idName) {
-        return activity.findViewById(activity.getResources().getIdentifier(idName, "id", activity.getPackageName()));
     }
 
     public void startActivity(Context context, String targetActivity, Map<String, Object> bundle) {
@@ -111,16 +97,4 @@ public class JsContext extends JavaMethod {
         }
     }
 
-    public Object getExtra(Activity activity, String key) {
-        Intent intent = activity.getIntent();
-        if (intent == null) {
-            return null;
-        }
-        Bundle extras = intent.getExtras();
-        if (extras == null) {
-            return null;
-        }
-
-        return extras.get(key);
-    }
 }

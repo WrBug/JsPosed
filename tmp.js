@@ -4,22 +4,26 @@ function start() {
         return
     }
     JsPosedBridge.log("Jsposed running");
-    JsPosedBridge.log("loadPackage", Env.packageName());
+    JsPosedBridge.log("loadPackage:", Env.packageName());
+    JsPosedBridge.log("processName:", Env.processName());
+    JsPosedBridge.log("isFirstApplication:", Env.isFirstApplication());
+    JsPosedBridge.log("sdk:", Env.sdkInit());
+    JsPosedBridge.log("sdk:", Env.buildVersion("SDK_INT"));
     mainHook();
     main2Hook();
 }
 function mainHook(){
-    JsPosedHelpers.findAndHookMethod("com.wrbug.jsposeddemo.MainActivity", "onCreate", ["android.os.Bundle"], null, function (methodHookParam) {
+    JsPosedHelpers.findAndHookMethod("com.wrbug.jsposeddemo.MainActivity",Env.classLoader(), "onCreate", ["android.os.Bundle"], null, function (methodHookParam) {
         var activity = JsPosedHelpers.getObjectField(methodHookParam, "thisObject");
         var tv = JsPosedHelpers.getObjectField(activity, "tv");
         var checkbox = JsPosedHelpers.getObjectField(activity, "mCheckBox");
-        var btn = JsContext.findViewById(activity, "btn")
-        JsView.setText(tv, "Jsposed running");
-        JsView.setText(btn, "点击跳转");
-        JsView.setTextColor(tv, 0xffff0000);
-        JsView.setTextSize(tv, 20);
-        JsView.setOnclickListener(tv, function (view) {
-            JsView.toggle(checkbox)
+        var btn = JsActivity.findViewById(activity, "btn")
+        JsTextView.setText(tv, "Jsposed running:"+Test.test(10));
+        JsTextView.setText(btn, "点击跳转");
+        JsTextView.setTextColor(tv, 0xffff0000);
+        JsTextView.setTextSize(tv, 20);
+        JsTextView.setOnclickListener(tv, function (view) {
+            JsCompoundButton.toggle(checkbox)
         });
         JsView.setOnclickListener(btn, function (view) {
             JsContext.startActivity(activity, "com.wrbug.jsposeddemo.Main2Activity", {
@@ -29,22 +33,22 @@ function mainHook(){
                 "d":[12345,"long"]
             })
         });
-        JsView.setOnCheckedChangeListener(checkbox, function (view, isChecked) {
-            JsView.setText(tv, "checkBox status:" + isChecked);
+        JsCompoundButton.setOnCheckedChangeListener(checkbox, function (view, isChecked) {
+            JsTextView.setText(tv, "checkBox status:" + isChecked);
         })
     })
 }
 function main2Hook() {
     JsPosedHelpers.findAndHookMethod("com.wrbug.jsposeddemo.Main2Activity", "onCreate", ["android.os.Bundle"], null, function (methodHookParam) {
         var activity = JsPosedHelpers.getObjectField(methodHookParam, "thisObject");
-        var container = JsContext.findViewById(activity, 2131165229)
+        var container = JsActivity.findViewById(activity, 2131165229)
         var keys = ["a", "b", "c", "d"];
         for (var i = 0; i < keys.length; i++) {
             var tv = JsPosedHelpers.newInstance("android.widget.TextView", [activity]);
-            JsView.setText(tv, JsContext.getExtra(activity, keys[i]) + "");
-            JsView.setTextSize(tv, 23);
-            JsView.setTextColor(tv, 0xffff0000);
-            JsView.setPadding(tv, 20, 20, 20, 20);
+            JsTextView.setText(tv, JsActivity.getExtras(activity, keys[i]) + "");
+            JsTextView.setTextSize(tv, 23);
+            JsTextView.setTextColor(tv, 0xffff0000);
+            JsTextView.setPadding(tv, 20, 20, 20, 20);
             JsViewGroup.addView(container, tv);
         }
     })

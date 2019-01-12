@@ -10,6 +10,10 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class JsCompoundButton extends JsTextView {
 
+    @Override
+    public String getName() {
+        return "JsCompoundButton";
+    }
 
     public void toggle(CompoundButton button) {
         button.toggle();

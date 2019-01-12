@@ -43,14 +43,41 @@ public class JsPosedHelpers extends JavaMethod {
 
     }
 
-    public Object newInstance(String className, Object[] args) {
-        return newInstance(className, XposedHelpers.getParameterTypes(args), args);
+    /**
+     * @param clazz     support Class or String ,
+     *                  eg. "java.lang.String","java.util.Map"
+     * @param fieldName
+     * @return
+     */
+    public Object getStaticObjectField(Object clazz, String fieldName) {
+        Class<?> cls = ClassUtils.toClass(clazz);
+        if (cls == null) {
+            return null;
+        }
+        return XposedHelpers.getStaticObjectField(cls, fieldName);
     }
 
-    public Object newInstance(String className, Object[] parameterTypes, Object[] args) {
+    /**
+     * @param clazz support Class or String ,
+     *              eg. "java.lang.String","java.util.Map"
+     * @param args
+     * @return
+     */
+    public Object newInstance(Object clazz, Object[] args) {
+        return newInstance(clazz, XposedHelpers.getParameterTypes(args), args);
+    }
+
+    /**
+     * @param clazz
+     * @param parameterTypes support Class or String ,
+     *                       eg. "java.lang.String","java.util.Map","int"
+     * @param args
+     * @return
+     */
+    public Object newInstance(Object clazz, Object[] parameterTypes, Object[] args) {
         Class[] classes = ClassUtils.toClass(mParam.classLoader, parameterTypes);
         try {
-            Class<?> aClass = mParam.classLoader.loadClass(className);
+            Class<?> aClass = ClassUtils.toClass(clazz);
             Constructor<?> constructor = XposedHelpers.findConstructorBestMatch(aClass, classes);
             if (constructor == null) {
                 return null;
@@ -65,10 +92,28 @@ public class JsPosedHelpers extends JavaMethod {
         return XposedHelpers.callMethod(o, methodName, args);
     }
 
+    public Object callStaticMethod(Object clazz, String methodName, Object[] args) {
+        Class<?> cls = ClassUtils.toClass(clazz);
+        if (cls == null) {
+            return null;
+        }
+        return XposedHelpers.callStaticMethod(cls, methodName, args);
+    }
+
     public Object callMethod(Object o, String methodName, Object[] classType, Object[] args) {
         Class[] classes = ClassUtils.toClass(mParam.classLoader, classType);
         args = ClassUtils.convertObject(classes, args);
         return XposedHelpers.callMethod(o, methodName, classes, args);
+    }
+
+    public Object callStaticMethod(Object clazz, String methodName, Object[] classType, Object[] args) {
+        Class<?> cls = ClassUtils.toClass(clazz);
+        if (cls == null) {
+            return null;
+        }
+        Class[] classes = ClassUtils.toClass(mParam.classLoader, classType);
+        args = ClassUtils.convertObject(classes, args);
+        return XposedHelpers.callStaticMethod(cls, methodName, classes, args);
     }
 
     public Method findMethodBestMatch(Class<?> clazz, String methodName, Object[] args) {
@@ -93,15 +138,23 @@ public class JsPosedHelpers extends JavaMethod {
         return null;
     }
 
-    public XC_MethodHook.Unhook findAndHookMethod(Class<?> clazz, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
+    /**
+     * @param clazz
+     * @param methodName
+     * @param argType
+     * @param beforeCall XC_MethodHook#beforeHookedMethod callback
+     * @param afterCall  XC_MethodHook#afterHookedMethod callback
+     * @return
+     */
+    public XC_MethodHook.Unhook findAndHookMethod(Object clazz, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
+        Class cls = ClassUtils.toClass(clazz, mParam.classLoader);
+        if (cls == null) {
+            return null;
+        }
         Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
-        return XposedHelpers.findAndHookMethod(clazz, methodName, array);
+        return XposedHelpers.findAndHookMethod(cls, methodName, array);
     }
 
-    public XC_MethodHook.Unhook findAndHookMethod(String className, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
-        Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
-        return XposedHelpers.findAndHookMethod(className, mParam.classLoader, methodName, array);
-    }
 
     public XC_MethodHook.Unhook findAndHookMethod(String className, ClassLoader classLoader, String methodName, Object[] argType, Function beforeCall, Function afterCall) {
         Object[] array = ArrayManager.getInstance().addArray(argType).add(new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall)).toArray();
@@ -112,11 +165,11 @@ public class JsPosedHelpers extends JavaMethod {
         return XposedHelpers.findMethodExactIfExists(clazz, methodName, parameterTypes);
     }
 
-    public Method findMethodExact(String className, ClassLoader classLoader, String methodName, Object... parameterTypes) {
+    public Method findMethodExact(String className, ClassLoader classLoader, String methodName, Object[] parameterTypes) {
         return XposedHelpers.findMethodExactIfExists(className, classLoader, methodName, parameterTypes);
     }
 
-    public Method findMethodBestMatch(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+    public Method findMethodBestMatch(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
         return XposedHelpers.findMethodBestMatch(clazz, methodName, parameterTypes);
     }
 }

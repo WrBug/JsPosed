@@ -5,7 +5,7 @@
 
 ### 下载体验
 
-1. 编译项目或 [下载apk](https://github.com/WrBug/JsPosed/releases) ，安装到有xposed环境的设备上
+1. 编译项目或 [下载apk](https://github.com/WrBug/JsPosed/releases/tag/demo) ，安装到有xposed环境的设备上
 
 2. 下载[tmp.js](https://github.com/WrBug/JsPosed/blob/master/tmp.js) 导入到手机 `/data/local/tmp` 目录下
 3. 第一次需要激活重启，重启后再次打开 app即可生效

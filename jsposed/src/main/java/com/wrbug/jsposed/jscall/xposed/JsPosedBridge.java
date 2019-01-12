@@ -1,7 +1,7 @@
 package com.wrbug.jsposed.jscall.xposed;
 
+import com.wrbug.jsposed.ClassUtils;
 import com.wrbug.jsposed.CommonMethodHook;
-import com.wrbug.jsposed.JsPosedExecutor;
 import com.wrbug.jsposed.jscall.JavaMethod;
 
 import org.mozilla.javascript.Function;
@@ -10,11 +10,8 @@ import java.util.Set;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class JsPosedBridge extends JavaMethod {
-
 
 
     @Override
@@ -39,11 +36,21 @@ public class JsPosedBridge extends JavaMethod {
     }
 
 
-    public Set<XC_MethodHook.Unhook> hookAllMethods(String hookClass, String methodName, Function beforeCall, Function afterCall) {
-        return XposedBridge.hookAllMethods(XposedHelpers.findClass(hookClass, mParam.classLoader), methodName, new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall));
+    /**
+     * @param hookClass  support Class or String ,
+     *                   eg. "java.lang.String","java.util.Map"
+     * @param methodName
+     * @param beforeCall XC_MethodHook#beforeHookedMethod callback
+     * @param afterCall  XC_MethodHook#afterHookedMethod callback
+     * @return
+     */
+    public Set<XC_MethodHook.Unhook> hookAllMethods(Object hookClass, String methodName, Function beforeCall, Function afterCall) {
+        Class clazz = ClassUtils.toClass(hookClass, mParam.classLoader);
+        return XposedBridge.hookAllMethods(clazz, methodName, new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall));
     }
 
-    public Set<XC_MethodHook.Unhook> hookAllConstructors(String hookClass, Function beforeCall, Function afterCall) {
-        return XposedBridge.hookAllConstructors(XposedHelpers.findClass(hookClass, mParam.classLoader), new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall));
+    public Set<XC_MethodHook.Unhook> hookAllConstructors(Object hookClass, Function beforeCall, Function afterCall) {
+        Class clazz = ClassUtils.toClass(hookClass, mParam.classLoader);
+        return XposedBridge.hookAllConstructors(clazz, new CommonMethodHook(mJsPosedExecutor, beforeCall, afterCall));
     }
 }

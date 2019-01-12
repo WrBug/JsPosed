@@ -1,16 +1,14 @@
 package com.wrbug.jsposed.jscall.view;
 
-import android.graphics.Color;
 import android.text.Html;
 import android.widget.TextView;
 
-import com.wrbug.jsposed.JsPosedExecutor;
-import com.wrbug.jsposed.JsNumberUtils;
-
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
-
 public class JsTextView extends JsView {
 
+    @Override
+    public String getName() {
+        return "JsTextView";
+    }
 
     public String getText(TextView textView) {
         return textView.getText().toString();
