@@ -22,7 +22,8 @@
 ### 配置依赖
 
 ```
-implementation 'com.wrbug:jsposed:0.0.1'
+
+implementation 'com.wrbug:jsposed:0.0.2'
 
 ```
  
