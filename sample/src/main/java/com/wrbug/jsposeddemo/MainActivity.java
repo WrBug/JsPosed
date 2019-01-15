@@ -2,6 +2,7 @@ package com.wrbug.jsposeddemo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
@@ -15,6 +16,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tv = findViewById(R.id.tv);
-        mCheckBox=findViewById(R.id.checkbox);
+        mCheckBox = findViewById(R.id.checkbox);
+
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        return super.dispatchKeyEvent(event);
     }
 }

@@ -2,17 +2,23 @@ package com.wrbug.jsposed.jscall.context;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.wrbug.jsposed.ClassUtils;
+import com.wrbug.jsposed.JsPosedReceiver;
 import com.wrbug.jsposed.jscall.JavaMethod;
 
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 
+import java.lang.ref.SoftReference;
+import java.util.HashMap;
 import java.util.Map;
 
 public class JsContext extends JavaMethod {
+    private static Map<String, SoftReference<JsPosedReceiver>> receiverMap = new HashMap<>();
 
     @Override
     public String getName() {
@@ -71,6 +77,45 @@ public class JsContext extends JavaMethod {
         intent.putExtras(b);
         context.startActivity(intent);
     }
+
+    public void registerReceiver(Context context, String key, String[] intentFilter, Function function) {
+        if (intentFilter == null || intentFilter.length == 0) {
+            return;
+        }
+        if (receiverMap.containsKey(key)) {
+            return;
+        }
+        JsPosedReceiver receiver = new JsPosedReceiver(new JsPosedReceiver.Callback(function) {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mJsPosedExecutor.call(mFunction, context, intent);
+            }
+        });
+        IntentFilter filter = new IntentFilter();
+        for (String s : intentFilter) {
+            filter.addAction(s);
+        }
+        context.registerReceiver(receiver, filter);
+        receiverMap.put(key, new SoftReference<>(receiver));
+    }
+
+    public void registerReceiver(Context context, String key) {
+        if (!receiverMap.containsKey(key)) {
+            return;
+        }
+        SoftReference<JsPosedReceiver> reference = receiverMap.get(key);
+        receiverMap.remove(key);
+        if (reference == null) {
+            return;
+        }
+        JsPosedReceiver receiver = reference.get();
+        if (receiver != null) {
+            context.unregisterReceiver(receiver);
+            reference.clear();
+        }
+    }
+
 
     public void putExtra(Bundle bundle, String key, Object value, Class clazz) {
         if (clazz == String.class) {
