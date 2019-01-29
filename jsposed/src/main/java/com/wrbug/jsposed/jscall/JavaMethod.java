@@ -16,5 +16,7 @@ public abstract class JavaMethod {
         mParam = param;
     }
 
-    public abstract String getName();
+    public String getName() {
+        return getClass().getSimpleName();
+    }
 }
