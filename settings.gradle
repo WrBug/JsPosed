@@ -1,1 +1,1 @@
-include ':sample', ':jsposed', ':JsPosedAnnotation', ':JsPosedCompile'
+include ':sample', ':jsposed', ':JsPosedAnnotation', ':JsPosedCompile', ':jsposedgradleplugin'

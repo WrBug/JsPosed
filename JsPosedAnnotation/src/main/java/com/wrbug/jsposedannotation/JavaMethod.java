@@ -17,4 +17,11 @@ public abstract class JavaMethod {
     public String getJavaMethodName() {
         return getClass().getSimpleName();
     }
+
+
+    @Override
+    public String toString() {
+        return "name=" + getJavaMethodName() + "," + getClass().getName();
+
+    }
 }

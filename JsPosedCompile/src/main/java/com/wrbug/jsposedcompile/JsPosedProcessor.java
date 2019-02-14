@@ -5,6 +5,7 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
+import com.wrbug.jsposedannotation.Constant;
 import com.wrbug.jsposedannotation.JavaClass;
 import com.wrbug.jsposedannotation.JavaMethod;
 
@@ -36,7 +37,6 @@ import javax.tools.Diagnostic;
 
 @AutoService(Processor.class)
 public class JsPosedProcessor extends AbstractProcessor {
-    private static final String BUILD_PACKAGE = "com.wrbug.jsposed.jclass.build";
     private Messager mMessager;
     private Elements mElementUtils;
     private Filer mFiler;
@@ -228,19 +228,20 @@ public class JsPosedProcessor extends AbstractProcessor {
         if (javaMethodMap.isEmpty()) {
             return;
         }
-        final String mapName = "map";
-        MethodSpec.Builder builder = MethodSpec.methodBuilder("getJavaMethodMap")
+        final String arrName = Constant.JAVA_METHOD_ARRAY_FIELD_NAME;
+        MethodSpec.Builder builder = MethodSpec.methodBuilder(Constant.JAVA_METHOD_ARRAY_GET_METHOD_NAME)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .addCode("return map;\n")
-                .returns(Map.class);
+                .addCode("return " + arrName + ";\n")
+                .returns(String[].class);
         StringBuilder staticCode = new StringBuilder();
-        staticCode.append("map=new HashMap();").append("\n");
+        staticCode.append(arrName + "=new String[").append(javaMethodMap.size()).append("]; \n ");
+        int i = 0;
         for (Map.Entry<String, String> entry : javaMethodMap.entrySet()) {
-            staticCode.append("map.put(\"").append(entry.getKey()).append("\", new ").append(entry.getValue()).append("());").append("\n ");
+            staticCode.append(arrName).append("[").append(i++).append("]=\"").append(entry.getValue()).append("\";\n");
         }
-        TypeSpec typeSpec = TypeSpec.classBuilder("JavaMethodMap")
+        TypeSpec typeSpec = TypeSpec.classBuilder(Constant.JAVA_METHOD_ARRAY_CLASS_NAME)
                 .addMethods(Arrays.asList(builder.build()))
-                .addField(HashMap.class, mapName, Modifier.STATIC)
+                .addField(String[].class, arrName, Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                 .addStaticBlock(CodeBlock.of(staticCode.toString()))
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL).build();
         buildFile(typeSpec);
@@ -269,7 +270,7 @@ public class JsPosedProcessor extends AbstractProcessor {
         }
         // 尝试生成文件
         try {
-            JavaFile.builder(BUILD_PACKAGE + "." + moduleName, typeSpec)
+            JavaFile.builder(Constant.BUILD_PACKAGE + "." + moduleName, typeSpec)
                     .build()
                     .writeTo(mFiler);
         } catch (IOException e) {

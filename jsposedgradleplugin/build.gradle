@@ -1,0 +1,19 @@
+apply plugin: 'groovy'
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation 'com.android.tools.build:gradle:3.2.1'
+}
+
+apply plugin: 'maven'
+group = 'com.wrbug.jsposedgradleplugin'
+version = '1.0.0'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //本地的Maven地址设置为D:/repos
+            repository(url: uri('../repo'))
+        }
+    }
+}

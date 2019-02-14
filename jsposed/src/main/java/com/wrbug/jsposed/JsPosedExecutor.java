@@ -7,6 +7,7 @@ import com.wrbug.jsposed.jscall.map.JsMap;
 import com.wrbug.jsposed.jscall.view.JsCompoundButton;
 import com.wrbug.jsposed.jscall.view.JsViewGroup;
 import com.wrbug.jsposed.jscall.xposed.Env;
+import com.wrbug.jsposedannotation.Constant;
 import com.wrbug.jsposedannotation.JavaMethod;
 import com.wrbug.jsposed.jscall.xposed.JsPosedBridge;
 import com.wrbug.jsposed.jscall.xposed.JsPosedHelpers;
@@ -18,10 +19,13 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -60,6 +64,7 @@ public class JsPosedExecutor implements Executable {
         mContext = Context.enter();
         mContext.setOptimizationLevel(-1);
         scope = mContext.initSafeStandardObjects();
+        loadJavaClass();
         addJavaMethod(new JsPosedBridge());
         addJavaMethod(new JsPosedHelpers());
         addJavaMethod(new Env());
@@ -68,6 +73,51 @@ public class JsPosedExecutor implements Executable {
         addJavaMethod(new JsActivity());
         addJavaMethod(new JsMap());
         run(js);
+    }
+
+    private void loadJavaClass() {
+        Class<?> buildConfigClass = XposedHelpers.findClassIfExists(mParam.packageName + ".BuildConfig", mParam.classLoader);
+        if (buildConfigClass == null) {
+            return;
+        }
+        Field field = null;
+        try {
+            field = buildConfigClass.getDeclaredField("MODULES_NAME");
+        } catch (NoSuchFieldException e) {
+        }
+        if (field == null) {
+            return;
+        }
+        String modulesName = (String) XposedHelpers.getStaticObjectField(buildConfigClass, "MODULES_NAME");
+        XposedBridge.log("modulesName=" + modulesName);
+        if (TextUtils.isEmpty(modulesName)) {
+            return;
+        }
+        String[] modulesNames = modulesName.split(",");
+        if (modulesNames.length > 0) {
+            for (String name : modulesNames) {
+                String className = Constant.BUILD_PACKAGE + "." + name + "." + Constant.JAVA_METHOD_ARRAY_CLASS_NAME;
+                Class javaMethodMapClass = XposedHelpers.findClassIfExists(className, mParam.classLoader);
+                if (javaMethodMapClass == null) {
+                    XposedBridge.log("className:" + className + " is null");
+                    continue;
+                }
+                String[] array = (String[]) XposedHelpers.callStaticMethod(javaMethodMapClass, Constant.JAVA_METHOD_ARRAY_GET_METHOD_NAME);
+                XposedBridge.log("map:" + Arrays.toString(array));
+                if (array == null || array.length == 0) {
+                    continue;
+                }
+                for (String cName : array) {
+                    JavaMethod value = null;
+                    try {
+                        value = (JavaMethod) Class.forName(cName).newInstance();
+                    } catch (Exception e) {
+                        XposedBridge.log(e);
+                    }
+                    addJavaMethod(value, false);
+                }
+            }
+        }
     }
 
     private void initCallLog() {
@@ -142,16 +192,24 @@ public class JsPosedExecutor implements Executable {
     }
 
     public void addJavaMethod(JavaMethod javaMethod) {
+        addJavaMethod(javaMethod, true);
+    }
+
+    public void addJavaMethod(JavaMethod javaMethod, boolean addSuperClass) {
         if (javaMethod == null) {
             return;
         }
         if (javaMethods.contains(javaMethod.getJavaMethodName())) {
             return;
         }
+        XposedBridge.log("addJavaMethod:" + javaMethod);
         javaMethod.setJsPosedExecutor(this);
         javaMethod.setParam(mParam);
         ScriptableObject.putProperty(scope, javaMethod.getJavaMethodName(), Context.javaToJS(javaMethod, scope));
         javaMethods.add(javaMethod.getJavaMethodName());
+        if (!addSuperClass) {
+            return;
+        }
         Class<?> superclass = javaMethod.getClass().getSuperclass();
         if (superclass != null && JavaMethod.class.isAssignableFrom(superclass) && JavaMethod.class != superclass && !javaMethods.contains(superclass)) {
             try {
@@ -164,6 +222,5 @@ public class JsPosedExecutor implements Executable {
                 e.printStackTrace();
             }
         }
-
     }
 }

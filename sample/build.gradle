@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'com.wrbug.jsposedgradleplugin'
 android {
     //编译需注释
     signingConfigs {
@@ -30,6 +30,7 @@ android {
             if (signingConfigs.releaseConfig != null) {
                 signingConfig signingConfigs.releaseConfig
             }
+
         }
     }
 }
