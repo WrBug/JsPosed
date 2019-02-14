@@ -1,11 +1,11 @@
 package com.wrbug.jsposeddemo;
 
-import com.wrbug.jsposed.jscall.JavaMethod;
+import com.wrbug.jsposedannotation.JavaMethod;
 
 public class Test extends JavaMethod {
 
     @Override
-    public String getName() {
+    public String getJavaMethodName() {
         return "Test";
     }
 

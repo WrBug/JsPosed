@@ -5,12 +5,12 @@ import android.text.TextUtils;
 import com.wrbug.jsposed.jscall.context.JsActivity;
 import com.wrbug.jsposed.jscall.map.JsMap;
 import com.wrbug.jsposed.jscall.view.JsCompoundButton;
-import com.wrbug.jsposed.jscall.context.JsContext;
 import com.wrbug.jsposed.jscall.view.JsViewGroup;
 import com.wrbug.jsposed.jscall.xposed.Env;
-import com.wrbug.jsposed.jscall.JavaMethod;
+import com.wrbug.jsposedannotation.JavaMethod;
 import com.wrbug.jsposed.jscall.xposed.JsPosedBridge;
 import com.wrbug.jsposed.jscall.xposed.JsPosedHelpers;
+import com.wrbug.jsposedannotation.Executable;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -28,13 +28,13 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-public class JsPosedExecutor {
+public class JsPosedExecutor implements Executable {
     private String js;
     private XC_LoadPackage.LoadPackageParam mParam;
     private volatile static JsPosedExecutor instance;
     private Context mContext;
     private Scriptable scope;
-    private List<Class> javaMethods = new ArrayList<>();
+    private List<String> javaMethods = new ArrayList<>();
 
     public static JsPosedExecutor init(XC_LoadPackage.LoadPackageParam param, String jsContent) {
         return init(param, jsContent, false);
@@ -120,6 +120,7 @@ public class JsPosedExecutor {
         run(js);
     }
 
+    @Override
     public void run(String js) {
         try {
             mContext.evaluateString(scope, js, mParam.packageName, 1, null);
@@ -128,6 +129,7 @@ public class JsPosedExecutor {
         }
     }
 
+    @Override
     public void call(Function call, Object... args) {
         try {
             if (call == null) {
@@ -143,13 +145,13 @@ public class JsPosedExecutor {
         if (javaMethod == null) {
             return;
         }
-        if (javaMethods.contains(javaMethod.getClass())) {
+        if (javaMethods.contains(javaMethod.getJavaMethodName())) {
             return;
         }
         javaMethod.setJsPosedExecutor(this);
         javaMethod.setParam(mParam);
-        ScriptableObject.putProperty(scope, javaMethod.getName(), Context.javaToJS(javaMethod, scope));
-        javaMethods.add(javaMethod.getClass());
+        ScriptableObject.putProperty(scope, javaMethod.getJavaMethodName(), Context.javaToJS(javaMethod, scope));
+        javaMethods.add(javaMethod.getJavaMethodName());
         Class<?> superclass = javaMethod.getClass().getSuperclass();
         if (superclass != null && JavaMethod.class.isAssignableFrom(superclass) && JavaMethod.class != superclass && !javaMethods.contains(superclass)) {
             try {

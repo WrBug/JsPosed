@@ -12,7 +12,7 @@ public class JsViewGroup extends JsView {
 
 
     @Override
-    public String getName() {
+    public String getJavaMethodName() {
         return "JsViewGroup";
     }
 

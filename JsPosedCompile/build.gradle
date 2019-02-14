@@ -1,0 +1,12 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation 'com.squareup:javapoet:1.10.0'
+    implementation 'com.google.auto.service:auto-service:1.0-rc3'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':JsPosedAnnotation')
+    compileOnly files('providedlibs/android.jar')
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"

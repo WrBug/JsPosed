@@ -1,14 +1,14 @@
 package com.wrbug.jsposed.jscall.map;
 
-import com.wrbug.jsposed.jscall.JavaMethod;
+import com.wrbug.jsposedannotation.JavaMethod;
+
 import java.util.Map;
 public class JsMap extends JavaMethod {
 
     @Override
-    public String getName() {
+    public String getJavaMethodName() {
         return "JsMap";
     }
-
 
     public Object put(Map map, Object key, Object value) {
         return map.put(key, value);

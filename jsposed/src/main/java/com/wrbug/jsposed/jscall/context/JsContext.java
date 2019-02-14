@@ -8,7 +8,7 @@ import android.widget.Toast;
 
 import com.wrbug.jsposed.ClassUtils;
 import com.wrbug.jsposed.JsPosedReceiver;
-import com.wrbug.jsposed.jscall.JavaMethod;
+import com.wrbug.jsposedannotation.JavaMethod;
 
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
@@ -21,7 +21,7 @@ public class JsContext extends JavaMethod {
     private static Map<String, SoftReference<JsPosedReceiver>> receiverMap = new HashMap<>();
 
     @Override
-    public String getName() {
+    public String getJavaMethodName() {
         return "JsContext";
     }
 

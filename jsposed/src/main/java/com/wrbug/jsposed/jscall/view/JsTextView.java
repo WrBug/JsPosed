@@ -6,7 +6,7 @@ import android.widget.TextView;
 public class JsTextView extends JsView {
 
     @Override
-    public String getName() {
+    public String getJavaMethodName() {
         return "JsTextView";
     }
 

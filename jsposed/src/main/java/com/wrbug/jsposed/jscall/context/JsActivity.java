@@ -7,7 +7,7 @@ import android.view.View;
 
 public class JsActivity extends JsContext {
     @Override
-    public String getName() {
+    public String getJavaMethodName() {
         return "JsActivity";
     }
 

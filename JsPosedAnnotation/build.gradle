@@ -1,0 +1,10 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly 'de.robv.android.xposed:api:82'
+    implementation 'org.mozilla:rhino:1.7.10'
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"

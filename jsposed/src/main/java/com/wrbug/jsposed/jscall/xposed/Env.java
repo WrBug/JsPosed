@@ -3,17 +3,15 @@ package com.wrbug.jsposed.jscall.xposed;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 
-import com.wrbug.jsposed.JsPosedExecutor;
-import com.wrbug.jsposed.jscall.JavaMethod;
+import com.wrbug.jsposedannotation.JavaMethod;
 
 import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class Env extends JavaMethod {
 
 
     @Override
-    public String getName() {
+    public String getJavaMethodName() {
         return "Env";
     }
 

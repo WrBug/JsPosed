@@ -3,30 +3,21 @@ package com.wrbug.jsposed.jscall.xposed;
 import com.wrbug.jsposed.ArrayManager;
 import com.wrbug.jsposed.ClassUtils;
 import com.wrbug.jsposed.CommonMethodHook;
-import com.wrbug.jsposed.JsPosedExecutor;
-import com.wrbug.jsposed.jscall.JavaMethod;
+import com.wrbug.jsposedannotation.JavaMethod;
 
 import org.mozilla.javascript.Function;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
-
-import static com.wrbug.jsposed.LogUtils.log;
 
 public class JsPosedHelpers extends JavaMethod {
 
     @Override
-    public String getName() {
+    public String getJavaMethodName() {
         return "JsPosedHelpers";
     }
 

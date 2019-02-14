@@ -2,7 +2,7 @@ package com.wrbug.jsposed.jscall.xposed;
 
 import com.wrbug.jsposed.ClassUtils;
 import com.wrbug.jsposed.CommonMethodHook;
-import com.wrbug.jsposed.jscall.JavaMethod;
+import com.wrbug.jsposedannotation.JavaMethod;
 
 import org.mozilla.javascript.Function;
 
@@ -15,7 +15,7 @@ public class JsPosedBridge extends JavaMethod {
 
 
     @Override
-    public String getName() {
+    public String getJavaMethodName() {
         return "JsPosedBridge";
     }
 

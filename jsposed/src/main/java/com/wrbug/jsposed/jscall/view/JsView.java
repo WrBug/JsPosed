@@ -2,18 +2,14 @@ package com.wrbug.jsposed.jscall.view;
 
 import android.view.View;
 
-import com.wrbug.jsposed.JsPosedExecutor;
-import com.wrbug.jsposed.JsNumberUtils;
-import com.wrbug.jsposed.jscall.JavaMethod;
+import com.wrbug.jsposedannotation.JavaMethod;
 
 import org.mozilla.javascript.Function;
-
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class JsView extends JavaMethod {
 
     @Override
-    public String getName() {
+    public String getJavaMethodName() {
         return "JsView";
     }
 
