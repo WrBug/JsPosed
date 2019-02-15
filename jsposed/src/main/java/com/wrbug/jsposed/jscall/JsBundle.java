@@ -1,9 +1,9 @@
-package com.wrbug.jsposeddemo;
+package com.wrbug.jsposed.jscall;
 
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
-import com.wrbug.jsposed.jclass.build.sample.JsBundle_;
+import com.wrbug.jsposed.jclass.build.jsposed.JsBundle_;
 import com.wrbug.jsposedannotation.JavaClass;
 
 @JavaClass(Bundle.class)

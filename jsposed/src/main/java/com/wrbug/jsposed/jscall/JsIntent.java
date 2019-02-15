@@ -1,10 +1,10 @@
-package com.wrbug.jsposeddemo;
+package com.wrbug.jsposed.jscall;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.wrbug.jsposed.jclass.build.sample.JsIntent_;
+import com.wrbug.jsposed.jclass.build.jsposed.JsIntent_;
 import com.wrbug.jsposedannotation.JavaClass;
 
 @JavaClass(value = Intent.class, name = "JsIntent")

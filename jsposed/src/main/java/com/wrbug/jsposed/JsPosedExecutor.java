@@ -2,12 +2,8 @@ package com.wrbug.jsposed;
 
 import android.text.TextUtils;
 
-import com.wrbug.jsposed.jscall.map.JsMap;
-import com.wrbug.jsposed.jscall.view.JsCompoundButton;
-import com.wrbug.jsposed.jscall.view.JsViewGroup;
 import com.wrbug.jsposed.jscall.xposed.Env;
 import com.wrbug.jsposed.jscall.xposed.JsPosedBridge;
-import com.wrbug.jsposed.jscall.xposed.JsPosedHelpers;
 import com.wrbug.jsposedannotation.Constant;
 import com.wrbug.jsposedannotation.Executable;
 import com.wrbug.jsposedannotation.JavaMethod;
@@ -81,7 +77,6 @@ public class JsPosedExecutor implements Executable {
         loadJavaClass();
         addJavaMethod(new JsPosedBridge());
         addJavaMethod(new Env());
-        addJavaMethod(new JsMap());
         run(js);
     }
 

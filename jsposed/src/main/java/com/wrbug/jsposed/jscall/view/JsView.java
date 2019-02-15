@@ -1,108 +1,32 @@
 package com.wrbug.jsposed.jscall.view;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.util.AttributeSet;
 import android.view.View;
 
-import com.wrbug.jsposedannotation.JavaMethod;
+import com.wrbug.jsposed.jclass.build.jsposed.JsView_;
+import com.wrbug.jsposedannotation.JavaClass;
 
-import org.mozilla.javascript.Function;
 
-public class JsView extends JavaMethod {
-
-    @Override
-    public String getJavaMethodName() {
-        return "JsView";
+@JavaClass(View.class)
+public class JsView extends JsView_ {
+    public JsView(Context arg0, AttributeSet arg1, int arg2, int arg3) {
+        super(arg0, arg1, arg2, arg3);
     }
 
-    public boolean isEnabled(View view) {
-        return view.isEnabled();
+    public JsView(Context arg0, AttributeSet arg1, int arg2) {
+        super(arg0, arg1, arg2);
     }
 
-    public void setEnabled(View view, boolean enabled) {
-        view.setEnabled(enabled);
+    public JsView(Context arg0, AttributeSet arg1) {
+        super(arg0, arg1);
     }
 
-
-    public boolean isSelected(View view) {
-        return view.isSelected();
+    public JsView(Context arg0) {
+        super(arg0);
     }
 
-    public void setSelected(View view, boolean selected) {
-        view.setSelected(selected);
-    }
-
-    public boolean isFocusable(View view) {
-        return view.isFocusable();
-    }
-
-
-    public void setFocusable(View view, boolean focusable) {
-        view.setFocusable(focusable);
-    }
-
-
-    public int getVisibility(View view) {
-        return view.getVisibility();
-    }
-
-    public void setVisibility(View view, long visibility) {
-        view.setVisibility((int) visibility);
-    }
-
-
-    public void setTag(View view, Object tag) {
-        view.setTag(tag);
-    }
-
-    public Object getTag(View view) {
-        return view.getTag();
-    }
-
-    public void setTag(View view, long key, Object tag) {
-        view.setTag((int) key, tag);
-    }
-
-    public void getTag(View view, long key) {
-        view.getTag((int) key);
-    }
-
-    public void setPadding(View view, long left, long top, long right, long bottom) {
-        view.setPadding(((int) left), ((int) top), ((int) right), (int) bottom);
-    }
-
-    public boolean performClick(View view) {
-        return view.performClick();
-    }
-
-    public boolean performLongClick(View view) {
-
-        return view.performLongClick();
-    }
-
-    public void setOnclickListener(View view, final Function function) {
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mJsPosedExecutor.call(function, v);
-            }
-        });
-    }
-
-    public void setOnFocusChangeListener(View view, final Function function) {
-        view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                mJsPosedExecutor.call(function, v, hasFocus);
-            }
-        });
-    }
-
-    public void setOnLongClickListener(View view, final Function function) {
-        view.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                mJsPosedExecutor.call(function, v);
-                return false;
-            }
-        });
+    public JsView() {
     }
 }

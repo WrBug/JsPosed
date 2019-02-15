@@ -1,60 +1,30 @@
 package com.wrbug.jsposed.jscall.view;
 
-import android.text.Html;
+import android.content.Context;
+import android.util.AttributeSet;
 import android.widget.TextView;
 
-public class JsTextView extends JsView {
+import com.wrbug.jsposed.jclass.build.jsposed.JsTextView_;
+import com.wrbug.jsposedannotation.JavaClass;
 
-    @Override
-    public String getJavaMethodName() {
-        return "JsTextView";
+@JavaClass(TextView.class)
+public class JsTextView extends JsTextView_ {
+    public JsTextView(Context arg0, AttributeSet arg1, int arg2, int arg3) {
+        super(arg0, arg1, arg2, arg3);
     }
 
-    public String getText(TextView textView) {
-        return textView.getText().toString();
+    public JsTextView(Context arg0, AttributeSet arg1, int arg2) {
+        super(arg0, arg1, arg2);
     }
 
-    public void setText(TextView textView, String text, boolean isHtml) {
-        textView.setText(isHtml ? Html.fromHtml(text) : text);
+    public JsTextView(Context arg0, AttributeSet arg1) {
+        super(arg0, arg1);
     }
 
-    public void setText(TextView textView, String text) {
-        setText(textView, text, false);
+    public JsTextView(Context arg0) {
+        super(arg0);
     }
 
-    public void setText(TextView textView, long id) {
-        textView.setText(((int) id));
-    }
-
-    public int length(TextView textView) {
-        return textView.length();
-    }
-
-    public float getTextSize(TextView textView) {
-        return textView.getTextSize();
-    }
-
-    public void setTextSize(TextView textView, float size) {
-        textView.setTextSize(size);
-    }
-
-    public void setTextColor(TextView textView, long color) {
-        textView.setTextColor(((int) color));
-    }
-
-    public final void setHint(TextView textView, long resid) {
-        textView.setHint((int) resid);
-    }
-
-    public final void setHint(TextView textView, String hint) {
-        textView.setHint(hint);
-    }
-
-    public String getHint(TextView textView) {
-        return textView.getHint().toString();
-    }
-
-    public void setInputType(TextView textView, long type) {
-        textView.setInputType((int) type);
+    public JsTextView() {
     }
 }

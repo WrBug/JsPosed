@@ -1,10 +1,10 @@
-package com.wrbug.jsposeddemo;
+package com.wrbug.jsposed.jscall.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.CheckBox;
 
-import com.wrbug.jsposed.jclass.build.sample.JsCheckBox_;
+import com.wrbug.jsposed.jclass.build.jsposed.JsCheckBox_;
 import com.wrbug.jsposedannotation.JavaClass;
 
 @JavaClass(CheckBox.class)

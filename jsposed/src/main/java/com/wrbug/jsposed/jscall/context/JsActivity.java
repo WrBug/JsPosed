@@ -2,32 +2,17 @@ package com.wrbug.jsposed.jscall.context;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.View;
 
-public class JsActivity extends JsContext {
-    @Override
-    public String getJavaMethodName() {
-        return "JsActivity";
+import com.wrbug.jsposed.jclass.build.jsposed.JsActivity_;
+import com.wrbug.jsposedannotation.JavaClass;
+
+@JavaClass(value = Activity.class)
+public class JsActivity extends JsActivity_ {
+
+    public View findViewById(String idName) {
+        return findViewById(getResources().getIdentifier(idName, "id", getPackageName()));
     }
 
-    public View findViewById(Activity activity, long id) {
-        return activity.findViewById((int) id);
-    }
 
-    public View findViewById(Activity activity, String idName) {
-        return activity.findViewById(activity.getResources().getIdentifier(idName, "id", activity.getPackageName()));
-    }
-
-    public Object getExtras(Activity activity, String key) {
-        Intent intent = activity.getIntent();
-        if (intent == null) {
-            return null;
-        }
-        Bundle extras = intent.getExtras();
-        if (extras == null) {
-            return null;
-        }
-        return extras.get(key);
-    }
 }
