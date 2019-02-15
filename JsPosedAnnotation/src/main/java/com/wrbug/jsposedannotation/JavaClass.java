@@ -9,5 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 public @interface JavaClass {
     Class value();
+
     String name() default "";
 }

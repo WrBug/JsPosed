@@ -28,7 +28,6 @@ public class JsActivity extends JsContext {
         if (extras == null) {
             return null;
         }
-
         return extras.get(key);
     }
 }

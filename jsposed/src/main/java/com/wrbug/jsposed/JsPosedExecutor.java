@@ -2,16 +2,15 @@ package com.wrbug.jsposed;
 
 import android.text.TextUtils;
 
-import com.wrbug.jsposed.jscall.context.JsActivity;
 import com.wrbug.jsposed.jscall.map.JsMap;
 import com.wrbug.jsposed.jscall.view.JsCompoundButton;
 import com.wrbug.jsposed.jscall.view.JsViewGroup;
 import com.wrbug.jsposed.jscall.xposed.Env;
-import com.wrbug.jsposedannotation.Constant;
-import com.wrbug.jsposedannotation.JavaMethod;
 import com.wrbug.jsposed.jscall.xposed.JsPosedBridge;
 import com.wrbug.jsposed.jscall.xposed.JsPosedHelpers;
+import com.wrbug.jsposedannotation.Constant;
 import com.wrbug.jsposedannotation.Executable;
+import com.wrbug.jsposedannotation.JavaMethod;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -24,8 +23,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -39,6 +36,23 @@ public class JsPosedExecutor implements Executable {
     private Context mContext;
     private Scriptable scope;
     private List<String> javaMethods = new ArrayList<>();
+    private static final String TAG = "JsPosedExecutor";
+
+
+    private static void log(Object... obj) {
+        if (obj == null || obj.length == 0) {
+            return;
+        }
+        XposedBridge.log("------" + TAG + "------");
+        for (Object o : obj) {
+            if (o instanceof Throwable) {
+                XposedBridge.log(((Throwable) o));
+            } else {
+                XposedBridge.log(String.valueOf(o));
+            }
+        }
+        XposedBridge.log("------------\n");
+    }
 
     public static JsPosedExecutor init(XC_LoadPackage.LoadPackageParam param, String jsContent) {
         return init(param, jsContent, false);
@@ -66,11 +80,7 @@ public class JsPosedExecutor implements Executable {
         scope = mContext.initSafeStandardObjects();
         loadJavaClass();
         addJavaMethod(new JsPosedBridge());
-        addJavaMethod(new JsPosedHelpers());
         addJavaMethod(new Env());
-        addJavaMethod(new JsCompoundButton());
-        addJavaMethod(new JsViewGroup());
-        addJavaMethod(new JsActivity());
         addJavaMethod(new JsMap());
         run(js);
     }
@@ -89,7 +99,7 @@ public class JsPosedExecutor implements Executable {
             return;
         }
         String modulesName = (String) XposedHelpers.getStaticObjectField(buildConfigClass, "MODULES_NAME");
-        XposedBridge.log("modulesName=" + modulesName);
+        log("modulesName=" + modulesName);
         if (TextUtils.isEmpty(modulesName)) {
             return;
         }
@@ -99,20 +109,25 @@ public class JsPosedExecutor implements Executable {
                 String className = Constant.BUILD_PACKAGE + "." + name + "." + Constant.JAVA_METHOD_ARRAY_CLASS_NAME;
                 Class javaMethodMapClass = XposedHelpers.findClassIfExists(className, mParam.classLoader);
                 if (javaMethodMapClass == null) {
-                    XposedBridge.log("className:" + className + " is null");
+                    log("className:" + className + " is null");
                     continue;
                 }
                 String[] array = (String[]) XposedHelpers.callStaticMethod(javaMethodMapClass, Constant.JAVA_METHOD_ARRAY_GET_METHOD_NAME);
-                XposedBridge.log("map:" + Arrays.toString(array));
+                log("map:" + Arrays.toString(array));
                 if (array == null || array.length == 0) {
                     continue;
                 }
                 for (String cName : array) {
                     JavaMethod value = null;
                     try {
-                        value = (JavaMethod) Class.forName(cName).newInstance();
+                        Object obj = Class.forName(cName).newInstance();
+                        if (obj instanceof JavaMethod) {
+                            value = (JavaMethod) obj;
+                        } else {
+                            log(cName + " 未继承[" + cName + "_],忽略");
+                        }
                     } catch (Exception e) {
-                        XposedBridge.log(e);
+                        log(e);
                     }
                     addJavaMethod(value, false);
                 }
@@ -175,7 +190,7 @@ public class JsPosedExecutor implements Executable {
         try {
             mContext.evaluateString(scope, js, mParam.packageName, 1, null);
         } catch (Throwable t) {
-            XposedBridge.log(t);
+            log(t);
         }
     }
 
@@ -187,7 +202,7 @@ public class JsPosedExecutor implements Executable {
             }
             call.call(mContext, scope, scope, args);
         } catch (Throwable t) {
-            XposedBridge.log(t);
+            log(t);
         }
     }
 
@@ -202,7 +217,7 @@ public class JsPosedExecutor implements Executable {
         if (javaMethods.contains(javaMethod.getJavaMethodName())) {
             return;
         }
-        XposedBridge.log("addJavaMethod:" + javaMethod);
+        log("addJavaMethod:" + javaMethod);
         javaMethod.setJsPosedExecutor(this);
         javaMethod.setParam(mParam);
         ScriptableObject.putProperty(scope, javaMethod.getJavaMethodName(), Context.javaToJS(javaMethod, scope));

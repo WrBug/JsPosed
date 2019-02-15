@@ -8,9 +8,12 @@ import com.squareup.javapoet.TypeSpec;
 import com.wrbug.jsposedannotation.Constant;
 import com.wrbug.jsposedannotation.JavaClass;
 import com.wrbug.jsposedannotation.JavaMethod;
+import com.wrbug.jsposedcompile.methodextension.MethodExtensionManager;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -35,19 +38,23 @@ import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
+import static com.wrbug.jsposedannotation.Constant.ORIGIN_VALUE_NAME;
+
 @AutoService(Processor.class)
 public class JsPosedProcessor extends AbstractProcessor {
     private Messager mMessager;
     private Elements mElementUtils;
     private Filer mFiler;
-    private static final String ORIGIN_VALUE_NAME = "value0";
     private Map<String, String> javaMethodMap = new HashMap<>();
     private String moduleName;
+    private List<String> objectFinalMethodNames;
+    private MethodExtensionManager mMethodExtensionManager;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         // 生成文件所需
+        mMethodExtensionManager = new MethodExtensionManager();
         javaMethodMap.clear();
         mFiler = processingEnv.getFiler();
         mMessager = processingEnv.getMessager();
@@ -55,6 +62,21 @@ public class JsPosedProcessor extends AbstractProcessor {
         moduleName = processingEnv.getOptions().get("moduleName");
         if (moduleName != null) {
             moduleName = moduleName.replace("-", "_").toLowerCase();
+        }
+        initObjectFinalMethod();
+    }
+
+
+    private void initObjectFinalMethod() {
+        objectFinalMethodNames = new ArrayList<>();
+        Method[] declaredMethods = Object.class.getDeclaredMethods();
+        List<Method> tmp = new ArrayList<>(Arrays.asList(declaredMethods));
+        Method[] methods = Object.class.getMethods();
+        tmp.addAll(Arrays.asList(methods));
+        for (Method method : tmp) {
+            if (java.lang.reflect.Modifier.isFinal(method.getModifiers())) {
+                objectFinalMethodNames.add(getMethodName(method));
+            }
         }
     }
 
@@ -74,69 +96,108 @@ public class JsPosedProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         mMessager.printMessage(Diagnostic.Kind.NOTE, "processing...");
         Set<? extends Element> javaClassElements = roundEnvironment.getElementsAnnotatedWith(JavaClass.class);
-        mMessager.printMessage(Diagnostic.Kind.NOTE, "process routeElements size " + javaClassElements.size());
         for (Element element : javaClassElements) {
             JavaClass javaClass = element.getAnnotation(JavaClass.class);
-            Class clazz = null;
+            Class targetClass = null;
             try {
-                clazz = javaClass.value();
+                targetClass = javaClass.value();
             } catch (MirroredTypeException e) {
                 mMessager.printMessage(Diagnostic.Kind.NOTE, e.getTypeMirror().toString());
                 try {
-                    clazz = Class.forName(e.getTypeMirror().toString());
+                    targetClass = Class.forName(e.getTypeMirror().toString());
                 } catch (ClassNotFoundException e1) {
                     e1.printStackTrace();
                 }
             }
-
-            if (clazz == null || clazz.isInterface()) {
+            if (targetClass == null || targetClass.isInterface()) {
                 continue;
             }
             List<MethodSpec> list = new ArrayList<>();
-            buildDefaultMethod(list, javaClass, element, clazz);
-            buildConstructorMethod(list, element, clazz);
-            Method[] declaredMethods = clazz.getMethods();
-            for (Method declaredMethod : declaredMethods) {
-                if (!java.lang.reflect.Modifier.isPublic(declaredMethod.getModifiers())
-                        || java.lang.reflect.Modifier.isFinal(declaredMethod.getModifiers())
-                        || java.lang.reflect.Modifier.isAbstract(declaredMethod.getModifiers())
-                        || (declaredMethod.getModifiers() & 4096) != 0) {
-                    continue;
-                }
-                boolean staticMethod = java.lang.reflect.Modifier.isStatic(declaredMethod.getModifiers());
-                StringBuilder code = new StringBuilder();
-                MethodSpec.Builder builder = MethodSpec.methodBuilder(declaredMethod.getName())
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(declaredMethod.getReturnType());
-
-                if (declaredMethod.getReturnType() != void.class) {
-                    code.append("return ");
-                }
-                Type[] genericExceptionTypes = declaredMethod.getGenericExceptionTypes();
-                if (genericExceptionTypes != null && genericExceptionTypes.length > 0) {
-                    for (Type exceptionType : genericExceptionTypes) {
-                        builder.addException(exceptionType);
+            buildDefaultMethod(list, javaClass, element, targetClass);
+            buildWrapperMethod(list, element, targetClass);
+            buildConstructorMethod(list, element, targetClass);
+            Map<String, List<Method>> methodMap = getMethod(targetClass);
+            for (Map.Entry<String, List<Method>> entry : methodMap.entrySet()) {
+                String methodName = entry.getKey();
+                Map<String, MethodSpec> existMethodMap = new HashMap<>();
+                List<Method> methodList = entry.getValue();
+                for (Method declaredMethod : methodList) {
+                    if (!java.lang.reflect.Modifier.isPublic(declaredMethod.getModifiers())
+                            || (declaredMethod.getModifiers() & 4096) != 0) {
+                        continue;
                     }
+                    String existMethodMapKey = declaredMethod.getName() + Arrays.toString(declaredMethod.getParameterTypes());
+                    MethodSpec methodSpec = existMethodMap.get(existMethodMapKey);
+                    if (methodSpec != null) {
+                        list.remove(methodSpec);
+                    }
+                    boolean staticMethod = java.lang.reflect.Modifier.isStatic(declaredMethod.getModifiers());
+                    StringBuilder code = new StringBuilder();
+                    MethodSpec.Builder builder = MethodSpec.methodBuilder(declaredMethod.getName())
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(declaredMethod.getReturnType());
+                    if (!staticMethod) {
+                        if (declaredMethod.getReturnType().isPrimitive()) {
+                            String defaultValue = "0";
+                            if (declaredMethod.getReturnType() == void.class) {
+                                defaultValue = "";
+                            } else if (declaredMethod.getReturnType() == boolean.class) {
+                                defaultValue = "false";
+                            }
+                            code.append("if(").append(ORIGIN_VALUE_NAME).append("==null){return ").append(defaultValue).append(";}");
+                        } else if (declaredMethod.getReturnType() == String.class) {
+                            code.append("if(").append(ORIGIN_VALUE_NAME).append("==null){return \"\";}");
+                        } else {
+                            code.append("if(").append(ORIGIN_VALUE_NAME).append("==null){return null;}");
+                        }
+                    }
+                    if (declaredMethod.getReturnType() != void.class) {
+                        code.append("return ");
+                    }
+                    Type[] genericExceptionTypes = declaredMethod.getGenericExceptionTypes();
+                    if (genericExceptionTypes != null && genericExceptionTypes.length > 0) {
+                        for (Type exceptionType : genericExceptionTypes) {
+                            builder.addException(exceptionType);
+                        }
+                    }
+                    if (staticMethod) {
+                        builder.addModifiers(Modifier.STATIC);
+                    }
+                    Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
+                    int a = 0;
+                    StringBuilder params = new StringBuilder();
+                    for (int i = 0; i < parameterTypes.length; i++) {
+                        Class<?> parameterType = parameterTypes[i];
+                        String name = "arg" + a++;
+                        Class tmp = parameterType;
+                        if (parameterType == int.class) {
+                            tmp = long.class;
+                            parameterTypes[i] = tmp;
+                        }
+                        builder.addParameter(tmp, name);
+                        if (parameterType.isPrimitive()) {
+                            params.append("(").append(parameterType.getSimpleName()).append(")");
+                        }
+                        params.append(name).append(",");
+                    }
+                    existMethodMapKey = declaredMethod.getName() + Arrays.toString(parameterTypes);
+                    MethodSpec spec = existMethodMap.get(existMethodMapKey);
+                    if (spec != null) {
+                        continue;
+                    }
+                    if (params.length() > 0) {
+                        params.deleteCharAt(params.length() - 1);
+                    }
+                    code.append(staticMethod ? targetClass.getName() : ORIGIN_VALUE_NAME).append(".").append(declaredMethod.getName()).append("(").append(params).append(");\n");
+                    builder.addCode(code.toString());
+                    MethodSpec build = builder.build();
+                    list.add(build);
+                    existMethodMap.put(existMethodMapKey, build);
                 }
-                if (staticMethod) {
-                    builder.addModifiers(Modifier.STATIC);
-                }
-                Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
-                int a = 0;
-                StringBuilder params = new StringBuilder();
-                for (Class<?> parameterType : parameterTypes) {
-                    String name = "arg" + a++;
-                    builder.addParameter(parameterType, name);
-                    params.append(name).append(",");
-                }
-                if (params.length() > 0) {
-                    params.deleteCharAt(params.length() - 1);
-                }
-                code.append(staticMethod ? clazz.getName() : ORIGIN_VALUE_NAME).append(".").append(declaredMethod.getName()).append("(").append(params).append(");\n");
-                builder.addCode(code.toString());
-                list.add(builder.build());
             }
-            buildJavaFile(element.getSimpleName().toString(), clazz, list);
+
+            mMethodExtensionManager.build(list, targetClass);
+            buildJavaFile(element.getSimpleName().toString(), targetClass, list);
             String jsName = javaClass.name();
             if (jsName.isEmpty()) {
                 jsName = element.getSimpleName().toString();
@@ -149,7 +210,46 @@ public class JsPosedProcessor extends AbstractProcessor {
     }
 
 
+    private Map<String, List<Method>> getMethod(Class clazz) {
+        List<String> names = new ArrayList<>();
+        Class currentClass = clazz;
+        Map<String, List<Method>> map = new HashMap<>();
+        while (currentClass != Object.class) {
+            Method[] declaredMethods = currentClass.getDeclaredMethods();
+            List<Method> tmp = new ArrayList<>(Arrays.asList(declaredMethods));
+            Method[] methods = currentClass.getMethods();
+            tmp.addAll(Arrays.asList(methods));
+            for (Method method : tmp) {
+                String name = getMethodName(method);
+                if (objectFinalMethodNames.contains(name)) {
+                    continue;
+                }
+                if (names.contains(name)) {
+                    continue;
+                }
+                names.add(name);
+                List<Method> list = map.get(method.getName());
+                if (list == null) {
+                    list = new ArrayList<>();
+                }
+                list.add(method);
+                map.put(method.getName(), list);
+            }
+            currentClass = currentClass.getSuperclass();
+        }
+        mMessager.printMessage(Diagnostic.Kind.NOTE, names.toString());
+        return map;
+    }
+
+    private String getMethodName(Method method) {
+        String modifier = java.lang.reflect.Modifier.isPublic(method.getModifiers()) + "_" + java.lang.reflect.Modifier.isStatic(method.getModifiers());
+        return (method.getName() + "_" + modifier + "_" + method.getReturnType() + "_" + Arrays.toString(method.getParameterTypes()));
+    }
+
     private void buildConstructorMethod(List<MethodSpec> list, Element element, Class clazz) {
+        if (java.lang.reflect.Modifier.isAbstract(clazz.getModifiers())) {
+            return;
+        }
         Constructor[] constructors = clazz.getConstructors();
         boolean existDefaultMethod = false;
         for (Constructor constructor : constructors) {
@@ -184,9 +284,24 @@ public class JsPosedProcessor extends AbstractProcessor {
         }
     }
 
+    private void buildWrapperMethod(List<MethodSpec> list, Element element, Class clazz) {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("wrapperInstance")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(clazz, "arg0")
+                .addJavadoc("包装value")
+                .returns(Object.class);
+        StringBuilder code = new StringBuilder();
+        code.append(element).append(" instance=new ").append(element).append("();\n ");
+        code.append("instance.").append(ORIGIN_VALUE_NAME).append(" = arg0;\n ");
+        code.append("return instance;\n ");
+        builder.addCode(code.toString());
+        list.add(builder.build());
+    }
+
+
     private void buildStaticConstructorMethod(List<MethodSpec> list, Element element, Constructor constructor) {
         StringBuilder code = new StringBuilder();
-        code.append("return new ").append(element.getSimpleName()).append("_").append("( ");
+        code.append("return new ").append(element).append("( ");
         MethodSpec.Builder builder = MethodSpec.methodBuilder("newInstance")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(Object.class);
@@ -252,7 +367,7 @@ public class JsPosedProcessor extends AbstractProcessor {
         TypeSpec typeSpec = TypeSpec.classBuilder(fileName + "_")
                 .superclass(JavaMethod.class)
                 .addMethods(list)
-                .addField(clazz, ORIGIN_VALUE_NAME)
+                .addField(clazz, ORIGIN_VALUE_NAME, Modifier.PROTECTED)
                 .addModifiers(Modifier.PUBLIC).build();
         buildFile(typeSpec);
     }

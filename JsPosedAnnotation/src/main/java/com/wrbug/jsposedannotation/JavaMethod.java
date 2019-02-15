@@ -3,8 +3,8 @@ package com.wrbug.jsposedannotation;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public abstract class JavaMethod {
-    protected Executable mJsPosedExecutor;
-    protected XC_LoadPackage.LoadPackageParam mParam;
+    protected static Executable mJsPosedExecutor;
+    protected static XC_LoadPackage.LoadPackageParam mParam;
 
     public void setJsPosedExecutor(Executable jsPosedExecutor) {
         mJsPosedExecutor = jsPosedExecutor;

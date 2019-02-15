@@ -5,7 +5,8 @@ dependencies {
     implementation 'com.google.auto.service:auto-service:1.0-rc3'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':JsPosedAnnotation')
-    compileOnly files('providedlibs/android.jar')
+    implementation 'org.mozilla:rhino:1.7.10'
+    compileOnly 'de.robv.android.xposed:api:82'
 }
 
 sourceCompatibility = "7"

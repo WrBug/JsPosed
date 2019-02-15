@@ -16,6 +16,12 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+                arguments = [moduleName: project.getName()]
+            }
+        }
     }
     buildTypes {
         debug {
@@ -43,6 +49,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     compileOnly 'de.robv.android.xposed:api:82'
+    implementation 'org.mozilla:rhino:1.7.10'
     //    implementation 'com.wrbug:jsposed:0.0.1'
     implementation project(':jsposed')
     implementation project(':JsPosedAnnotation')
