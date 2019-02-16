@@ -1,19 +1,22 @@
 package com.wrbug.jsposedcompile;
 
+import android.os.Bundle;
+
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.wrbug.jsposedannotation.Constant;
 import com.wrbug.jsposedannotation.JavaClass;
 import com.wrbug.jsposedannotation.JavaMethod;
+import com.wrbug.jsposedannotation.RealValueWrapper;
 import com.wrbug.jsposedcompile.methodextension.MethodExtensionManager;
 
-import java.awt.Color;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -54,10 +57,10 @@ public class JsPosedProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         // 生成文件所需
-        mMethodExtensionManager = new MethodExtensionManager();
         javaMethodMap.clear();
         mFiler = processingEnv.getFiler();
         mMessager = processingEnv.getMessager();
+        mMethodExtensionManager = new MethodExtensionManager(mMessager);
         mElementUtils = processingEnv.getElementUtils();
         moduleName = processingEnv.getOptions().get("moduleName");
         if (moduleName != null) {
@@ -94,7 +97,6 @@ public class JsPosedProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        mMessager.printMessage(Diagnostic.Kind.NOTE, "processing...");
         Set<? extends Element> javaClassElements = roundEnvironment.getElementsAnnotatedWith(JavaClass.class);
         for (Element element : javaClassElements) {
             JavaClass javaClass = element.getAnnotation(JavaClass.class);
@@ -112,6 +114,7 @@ public class JsPosedProcessor extends AbstractProcessor {
             if (targetClass == null || targetClass.isInterface()) {
                 continue;
             }
+            JavaClassListUtils.saveJavaClass(targetClass, element.toString());
             List<MethodSpec> list = new ArrayList<>();
             buildDefaultMethod(list, javaClass, element, targetClass);
             buildWrapperMethod(list, element, targetClass);
@@ -137,19 +140,8 @@ public class JsPosedProcessor extends AbstractProcessor {
                             .addModifiers(Modifier.PUBLIC)
                             .returns(declaredMethod.getReturnType());
                     if (!staticMethod) {
-                        if (declaredMethod.getReturnType().isPrimitive()) {
-                            String defaultValue = "0";
-                            if (declaredMethod.getReturnType() == void.class) {
-                                defaultValue = "";
-                            } else if (declaredMethod.getReturnType() == boolean.class) {
-                                defaultValue = "false";
-                            }
-                            code.append("if(").append(ORIGIN_VALUE_NAME).append("==null){return ").append(defaultValue).append(";}");
-                        } else if (declaredMethod.getReturnType() == String.class) {
-                            code.append("if(").append(ORIGIN_VALUE_NAME).append("==null){return \"\";}");
-                        } else {
-                            code.append("if(").append(ORIGIN_VALUE_NAME).append("==null){return null;}");
-                        }
+                        String defaultValue = DefaultValue.get(declaredMethod.getReturnType());
+                        code.append("if(").append(ORIGIN_VALUE_NAME).append("==null){return ").append(defaultValue).append(";}");
                     }
                     if (declaredMethod.getReturnType() != void.class) {
                         code.append("return ");
@@ -237,7 +229,6 @@ public class JsPosedProcessor extends AbstractProcessor {
             }
             currentClass = currentClass.getSuperclass();
         }
-        mMessager.printMessage(Diagnostic.Kind.NOTE, names.toString());
         return map;
     }
 
@@ -366,6 +357,7 @@ public class JsPosedProcessor extends AbstractProcessor {
         // 生成java文件，包含导航器Map
         TypeSpec typeSpec = TypeSpec.classBuilder(fileName + "_")
                 .superclass(JavaMethod.class)
+                .addSuperinterface(RealValueWrapper.class)
                 .addMethods(list)
                 .addField(clazz, ORIGIN_VALUE_NAME, Modifier.PROTECTED)
                 .addModifiers(Modifier.PUBLIC).build();

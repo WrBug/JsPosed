@@ -27,4 +27,5 @@ public class JsCheckBox extends JsCheckBox_ {
 
     public JsCheckBox() {
     }
+
 }
